@@ -116,6 +116,15 @@ body {
     background-color: #e0e0e0;
 }
 
+.edit-icon {
+    stroke: black; 
+}
+
+.edit-button:hover .edit-icon {
+    stroke: #205781; /* biru saat hover */
+    cursor: pointer;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;

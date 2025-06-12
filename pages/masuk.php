@@ -26,16 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (password_verify($password, $user['password'])) {
                 $_SESSION['id_user'] = $user['id_user'];
                 $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role']; // Simpan role ke session
 
-                $checkProfile = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
-                $checkProfile->bind_param("i", $user['id_user']);
-                $checkProfile->execute();
-                $profileResult = $checkProfile->get_result();
-
-                if ($profileResult->num_rows > 0) {
-                    header("Location: ../pages/beranda.php");
+                if ($user['role'] === 'admin') {
+                    header("Location: ../pages/admin.php");
                 } else {
-                    header("Location: ../pages/formulir.php");
+                    // Cek apakah user sudah punya profil usaha
+                    $checkProfile = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
+                    $checkProfile->bind_param("i", $user['id_user']);
+                    $checkProfile->execute();
+                    $profileResult = $checkProfile->get_result();
+
+                    if ($profileResult->num_rows > 0) {
+                        header("Location: ../pages/beranda.php");
+                    } else {
+                        header("Location: ../pages/formulir.php");
+                    }
                 }
                 exit();
             } else {
