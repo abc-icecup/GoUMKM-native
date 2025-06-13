@@ -1,3 +1,29 @@
+<?php
+session_start();
+include '../config/koneksi.php';
+
+// Cek apakah user sudah login dan punya role admin
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: masuk.php");
+    exit();
+}
+
+// Ambil data profil usaha + email dari users
+$query = "
+    SELECT pu.id_profil, pu.nama_usaha, u.email, pu.status
+    FROM profil_usaha pu
+    INNER JOIN users u ON pu.id_user = u.id_user
+";
+$result = $conn->query($query);
+$data_usaha = [];
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $data_usaha[] = $row;
+    }
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,7 +51,20 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Data akan diisi oleh JavaScript -->
+                <?php foreach ($data_usaha as $index => $item): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= htmlspecialchars($item['nama_usaha']) ?></td>
+                        <td><?= htmlspecialchars($item['email']) ?></td>
+                        <td class="status-cell"><?= ucfirst($item['status']) ?></td>
+                        <td class="action-cell" data-id="<?= $item['id_profil'] ?>" data-status="<?= $item['status'] ?>">
+                            <div class="action-content">
+                                <span class="status-indicator <?= $item['status'] === 'aktif' ? 'status-aktif' : 'status-nonaktif' ?>"></span>
+                                <span><?= $item['status'] === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' ?></span>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

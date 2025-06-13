@@ -2,11 +2,24 @@
 session_start();
 require_once '../config/koneksi.php'; // File koneksi database Anda
 
+$is_edit = isset($_GET['edit']) && $_GET['edit'] === 'true';
+
 // Cek apakah user sudah login
-// if (!isset($_SESSION['id_user'])) {
-//     header('Location: login.php');
-//     exit;
-// }
+if (!isset($_SESSION['id_user'])) {
+    header('Location: masuk.php');
+    exit;
+}
+
+// Tambahkan ini untuk ambil data profil jika sedang edit
+$data_lama = null;
+if ($is_edit) {
+    $id_user = $_SESSION['id_user'];
+    $stmt = $conn->prepare("SELECT * FROM profil_usaha WHERE id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data_lama = $result->fetch_assoc();
+}
 
 // Proses form saat disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -45,18 +58,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Jika edit dan tidak upload gambar baru, pertahankan gambar lama
+    if ($is_edit && $gambar === null && isset($data_lama['gambar'])) {
+        $gambar = $data_lama['gambar'];
+    }
+
     // Simpan ke database
-    $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $deskripsi, $link_whatsapp);
+    if ($is_edit) {
+        $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
+        $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
+    }
+
     if ($stmt->execute()) {
         header('Location: beranda.php '); // Redirect setelah sukses
         exit;
     } else {
-        $error = "Gagal menyimpan data. " . $stmt->error;
+        echo "Query error: " . $stmt->error;
     }
 }
 ?>
-
 
 
 <!DOCTYPE html>
@@ -81,15 +104,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form id="business-profile-form" method="POST" enctype="multipart/form-data">
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
+                    <?php if (!empty($data_lama['gambar'])): ?>
+                        <img src="uploads/<?= htmlspecialchars($data_lama['gambar']) ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old">
+                    <?php endif; ?>
+                    
                     <input type="file" id="business-photo" name="business-photo" accept="image/*">
                     <i class="fas fa-camera" id="camera-icon"></i>
-                    <img class="photo-preview" id="photo-preview" alt="Preview">
+                    
+                    <!-- Ini untuk JS preview gambar baru -->
+                    <img class="photo-preview" id="photo-preview" alt="Preview Gambar Baru">
                     <div class="tooltip">Upload foto usaha</div>
                 </div>
                 
                 <div class="input-group">
                     <label class="form-label" for="business-name">Nama Usaha</label>
-                    <input type="text" class="form-input" id="business-name" name="business-name" placeholder="Masukkan nama usaha" required>
+                    <input type="text" class="form-input" id="business-name" name="business-name" placeholder="Masukkan nama usaha" value="<?= htmlspecialchars($data_lama['nama_usaha'] ?? '') ?>" required>
                     <div class="validation-message" id="business-name-error">Nama usaha harus diisi</div>
                 </div>
             </div>
@@ -97,15 +126,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="input-row">
                 <div class="input-group">
                     <label class="form-label" for="owner-name">Nama Pemilik Usaha</label>
-                    <input type="text" class="form-input" id="owner-name" name="owner-name" placeholder="Masukkan nama pemilik" required>
+                    <input type="text" class="form-input" id="owner-name" name="owner-name" placeholder="Masukkan nama pemilik" value="<?= htmlspecialchars($data_lama['nama_pemilik'] ?? '') ?>" required>
                     <div class="validation-message" id="owner-name-error">Nama pemilik harus diisi</div>
                 </div>
                 
                 <div class="input-group">
                     <label class="form-label" for="business-category">Kategori Usaha</label>
-                    <select class="form-select" id="business-category" name="business-category" required>
+                    <select class="form-select" id="business-category" name="business-category" value="<?= htmlspecialchars($data_lama['kategori_usaha'] ?? '') ?>" required>
                         <option value="">Pilih kategori</option>
-                        <option value="Perdagangan">Perdagangan</option>
+                        <option value="Perdagangan" <?= ($data_lama['kategori_usaha'] ?? '') === 'Perdagangan' ? 'selected' : '' ?>>Perdagangan</option>
                         <option value="Jasa">Jasa</option>
                     </select>
                     <div class="validation-message" id="business-category-error">Kategori usaha harus dipilih</div>
@@ -114,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="input-group full-width">
                 <label class="form-label" for="business-address">Alamat Usaha</label>
-                <textarea class="form-textarea small" id="business-address" name="business-address" placeholder="Masukkan alamat lengkap usaha Anda..." required></textarea>
+                <textarea class="form-textarea small" id="business-address" name="business-address" placeholder="Masukkan alamat lengkap usaha Anda..." required><?= htmlspecialchars($data_lama['alamat'] ?? '') ?></textarea>
                 <div class="char-counter">
                     <span id="address-counter">max 300 character</span>
                 </div>
@@ -124,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="input-row">
                 <div class="input-group">
                     <label class="form-label" for="kecamatan">Kecamatan</label>
-                    <select class="form-select" id="kecamatan" name="kecamatan" required>
+                    <select class="form-select" id="kecamatan" name="kecamatan" value="<?= htmlspecialchars($data_lama['kecamatan'] ?? '') ?>" required>
                         <option value="">Pilih Kecamatan</option>
                         <option value="bacukiki">Bacukiki</option>
                         <option value="bacukiki-barat">Bacukiki Barat</option>
@@ -136,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <div class="input-group">
                     <label class="form-label" for="kelurahan">Kelurahan</label>
-                    <select class="form-select" id="kelurahan" name="kelurahan" required>
+                    <select class="form-select" id="kelurahan" name="kelurahan" value="<?= htmlspecialchars($data_lama['kelurahan'] ?? '') ?>" required>
                         <option value="">Pilih Kelurahan</option>
                     </select>
                     <div class="validation-message" id="kelurahan-error">Kelurahan harus dipilih</div>
@@ -145,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="input-group full-width">
                 <label class="form-label" for="business-description">Deskripsi Usaha</label>
-                <textarea class="form-textarea" id="business-description" name="business-description" placeholder="Ceritakan tentang usaha Anda..." required></textarea>
+                <textarea class="form-textarea" id="business-description" name="business-description" placeholder="Ceritakan tentang usaha Anda..." required><?= htmlspecialchars($data_lama['deskripsi'] ?? '') ?></textarea>
                 <div class="char-counter">
                     <span id="description-counter">max 1000 character</span>
                 </div>
@@ -154,13 +183,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="input-group full-width">
                 <label class="form-label" for="whatsapp-link">Link WhatsApp</label>
-                <input type="url" class="form-input" id="whatsapp-link" name="whatsapp-link" placeholder="https://wa.me/6281xxx">
+                <input type="url" class="form-input" id="whatsapp-link" name="whatsapp-link" placeholder="https://wa.me/6281xxx" value="<?= htmlspecialchars($data_lama['link_whatsapp'] ?? '') ?>" required>
                 <div class="validation-message" id="whatsapp-link-error">Format link WhatsApp tidak valid</div>
             </div>
 
             <button type="submit" class="submit-btn" id="submit-btn">
                 <span id="btn-text">Simpan</span>
             </button>
+            <?php if ($is_edit): ?>
+                <a href="profil_usaha.php" class="btn btn-secondary">Batal</a>
+            <?php endif; ?>
         </form>
 
         <div class="success-message message" id="success-message">
@@ -204,6 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         $('#photo-preview').attr('src', e.target.result).show();
+                        $('#photo-preview-old').hide(); // SEMBUNYIKAN gambar lama
                         $('#camera-icon').hide();
                         $('#photo-upload').addClass('has-image');
                     };
@@ -329,8 +362,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Form submission
             $('#business-profile-form').on('submit', function(e) {
-                e.preventDefault();
-                
                 // Hide previous messages
                 $('.message').hide();
                 
@@ -351,25 +382,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     scrollToFirstError();
                     return;
                 }
-
-                // Show loading state
-                showLoading(true);
-
-                // Simulate API call
-                setTimeout(function() {
-                    showLoading(false);
-                    
-                    // Simulate success (90% success rate for demo)
-                    if (Math.random() > 0.1) {
-                        showSuccess();
-                        // Reset form after success
-                        setTimeout(function() {
-                            resetForm();
-                        }, 2000);
-                    } else {
-                        showError('Terjadi kesalahan server. Silakan coba lagi.');
-                    }
-                }, 2000);
+                
             });
 
             // Utility functions

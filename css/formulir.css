@@ -96,6 +96,14 @@ body {
     display: none;
 }
 
+.photo-preview-old {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: none;    
+}
+
 .input-row {
     display: flex;
     gap: 20px;

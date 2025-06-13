@@ -23,13 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
+            echo "<pre>";
+            print_r($user);
+            echo "</pre>";
+
             if (password_verify($password, $user['password'])) {
+                echo "Password cocok<br>";
                 $_SESSION['id_user'] = $user['id_user'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role']; // Simpan role ke session
 
                 if ($user['role'] === 'admin') {
                     header("Location: ../pages/admin.php");
+                    die();
                 } else {
                     // Cek apakah user sudah punya profil usaha
                     $checkProfile = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
@@ -38,13 +44,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $profileResult = $checkProfile->get_result();
 
                     if ($profileResult->num_rows > 0) {
-                        header("Location: ../pages/beranda.php");
+                        header("Location: beranda.php");
+                        die();
                     } else {
-                        header("Location: ../pages/formulir.php");
+                        header("Location: formulir.php");
+                        die();
                     }
                 }
                 exit();
             } else {
+                // password salah
+                echo "Password TIDAK cocok<br>";
+                echo "Password yang dimasukkan: $password<br>";
+                echo "Password di database: " . $user['password'] . "<br>";
                 $error = "Email atau password salah.";
             }
         } else {
@@ -67,6 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </head>
 <body>
+    <?php if (!empty($error)): ?>
+        <p style="color: red;"><?php echo $error; ?>INI ERROR WELL</p>
+    <?php endif; ?>
+
     <div class="container">
         <div class="left-section">
             <div class="floating-elements">
@@ -112,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <button type="submit" class="submit-btn" id="submit-btn">
-                        masuk
+                        Masuk
                     </button>
                 </form>
             </div>

@@ -30,11 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute()) {
                 // Login otomatis
                 $user_id = $stmt->insert_id;
-                $_SESSION['id_user'] = $id_user;
+                $_SESSION['id_user'] = $user_id;
                 $_SESSION['email'] = $email;
 
                 // Redirect ke formulir langsung
-                header("Location: ../pages/formulir.php");
+                header("Location: formulir.php");
                 exit();
             } else {
                 $error = "Gagal mendaftar. Silakan coba lagi.";
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="form-container">
                 <h2 class="form-title">Daftarkan UMKM Anda</h2>
-                <p class="form-subtitle">Sudah punya akun Usaha? <a href="../pages/masuk.php" id="masuk-link">Masuk</a></p>
+                <p class="form-subtitle">Sudah punya akun Usaha? <a href="masuk.php" id="masuk-link">Masuk</a></p>
                 
                 <?php if (!empty($error)): ?>
                     <div class="error-message" id="error-message" style="display:block;">
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <button type="submit" class="submit-btn" id="submit-btn">
-                        daftar
+                        Daftar
                     </button>
                 </form>
             </div>
