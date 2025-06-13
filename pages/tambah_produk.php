@@ -1,3 +1,83 @@
+<?php
+session_start();
+require_once '../config/koneksi.php'; // file koneksi ke database
+
+$is_edit = isset($_GET['edit']) && $_GET['edit'] === 'true';
+
+// Cek login
+if (!isset($_SESSION['id_user'])) {
+    header('Location: masuk.php');
+    exit;
+}
+
+// Cek apakah user sudah punya profil usaha
+$stmt = $conn->prepare("SELECT 1 FROM profil_usaha WHERE id_user = ?");
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    die("Silakan isi profil usaha terlebih dahulu sebelum menambahkan produk.");
+}
+
+// Proses form tambah produk
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id_user = $_SESSION['id_user'];
+
+    $nama_produk = $_POST['business-name'] ?? '';
+    $harga = $_POST['owner-name'] ?? '';
+    $kategori = $_POST['business-category'] ?? '';
+    $deskripsi = $_POST['business-description'] ?? '';
+    $whatsapp = $_POST['whatsapp-link'] ?? '';
+}
+    // Validasi sederhana
+    if (strlen($nama_produk) < 2 || strlen($deskripsi) < 10) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => 'Validasi gagal.']);
+        exit;
+    }
+
+    // Proses upload gambar
+    $gambar = null;
+    if (isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] === UPLOAD_ERR_OK) {
+        $targetDir = "../uploads/";
+        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+
+        $ext = pathinfo($_FILES['business-photo']['name'], PATHINFO_EXTENSION);
+        $fileName = uniqid('produk_') . '.' . $ext;
+        $filePath = $targetDir . $fileName;
+
+        if (move_uploaded_file($_FILES['business-photo']['tmp_name'], $filePath)) {
+            $gambar = $fileName;
+        } else {
+            http_response_code(500);
+            echo json_encode(['status' => 'error', 'message' => 'Upload gambar gagal.']);
+            exit;
+        }
+    }
+
+    // Simpan ke database
+    $stmt = $conn->prepare("INSERT INTO produk (id_user, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssss", $id_user, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+
+    if ($stmt->execute()) {
+        header('Location: katalog_produk.php '); // Redirect setelah sukses
+    } else {
+        echo "Query erorr" : . $stmt->error;
+
+    // Simpan ke database
+    if ($is_edit) {
+        $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
+        $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
+    }
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
