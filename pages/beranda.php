@@ -10,7 +10,7 @@
     <!-- Header -->
     <header class="header">
         <div class="nav-left" >
-            <a href="#">
+            <a href="../pages/beranda.php">
                 <img src="../assets/img/image (2).png" alt="logo umkm" class="logo-umkm" >
             </a>     
         </div>

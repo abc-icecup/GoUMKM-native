@@ -1,3 +1,24 @@
+<?php
+session_start();
+require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
+
+// Pastikan user sudah login
+if (!isset($_SESSION['id_user'])) {
+    header("Location: masuk.php");
+    exit;
+}
+
+$id_user = $_SESSION['id_user'];
+
+// Ambil data profil usaha
+$stmt = $conn->prepare("SELECT * FROM profil_usaha WHERE id_user = ?");
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$result = $stmt->get_result();
+$data_profil = $result->fetch_assoc(); // hasil bisa null jika belum mengisi
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,7 +32,7 @@
 <body>
     <header class="header">
         <div class="nav-left" >
-            <a href="#">
+            <a href="../pages/beranda.php">
                 <img src="../assets/img/image (2).png" alt="logo umkm" class="logo-umkm" >
             </a>     
         </div>
@@ -22,10 +43,16 @@
         </div>
         
         <div class="profile-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
-            </svg>
+            <a href="profil_usaha.php">
+                <?php if (!empty($data_profil['gambar'])): ?>
+                    <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
+                <?php else: ?>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                <?php endif; ?>
+            </a>
         </div>
     </header>
 
@@ -43,33 +70,43 @@
                 
                 <div class="form-content">
                     <div class="image-placeholder">
-                        <svg class="image-icon" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
+                        <?php if (!empty($data_profil['gambar'])): ?>
+                            <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Gambar Usaha" class="img-preview">
+                        <?php else: ?>
+                            <svg class="image-icon" viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="form-fields">
                         <div class="form-row">
                             <span class="form-label">Nama Usaha</span>
-                            <span class="form-value form-dash">-</span>
+                            <span class="form-value"><?= htmlspecialchars($data_profil['nama_usaha'] ?? '-') ?></span>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Nama Pemilik Usaha</span>
-                            <span class="form-value form-dash">-</span>
+                            <span class="form-value"><?= htmlspecialchars($data_profil['nama_pemilik'] ?? '-') ?></span>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Kategori Usaha</span>
-                            <span class="form-value form-dash">-</span>
+                            <span class="form-value"><?= htmlspecialchars($data_profil['kategori_usaha'] ?? '-') ?></span>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Deskripsi Usaha</span>
-                            <span class="form-value form-dash">-</span>
+                            <span class="form-value"><?= htmlspecialchars($data_profil['deskripsi'] ?? '-') ?></span>
                         </div>
                         <div class="form-row">
                             <span class="form-label">Link Whatsapp</span>
-                            <span class="form-value form-dash">-</span>
+                            <span class="form-value">
+                                <?php if (!empty($data_profil['link_whatsapp'])): ?>
+                                    <a href="<?= htmlspecialchars($data_profil['link_whatsapp']) ?>" target="_blank"><?= htmlspecialchars($data_profil['link_whatsapp']) ?></a>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -173,10 +210,10 @@
                 alert('Profile menu diklik');
             });
 
-            // Handle edit icon click
-            $('.edit-icon').click(function() {
-                alert('Edit form diklik');
-            });
+            // // Handle edit icon click
+            // $('.edit-icon').click(function() {
+            //     alert('Edit form diklik');
+            // });
 
             // Handle delete product buttons
             $('.delete-btn').click(function(e) {

@@ -73,8 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($stmt->execute()) {
-        header('Location: beranda.php '); // Redirect setelah sukses
-        exit;
+        if ($is_edit) {
+            // Jika mode edit, redirect ke profil
+            header("Location: profil_usaha.php");
+            exit;
+        } else {
+            // Jika tambah data baru (setelah daftar)
+            header("Location: profil_usaha.php");
+            exit;
+        }
     } else {
         echo "Query error: " . $stmt->error;
     }
@@ -94,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="header">
-        <h1 class="brand-title">GoUMKM</h1>
+        <h1 class="brand-title" style="color: #205781;">GoUMKM</h1>
     </div>
 
     <div class="form-container">
@@ -262,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (selectedKecamatan && kelurahanData[selectedKecamatan]) {
                     // Add kelurahan options
                     kelurahanData[selectedKecamatan].forEach(function(kelurahan) {
-                        kelurahanSelect.append(`<option value="${kelurahan.toLowerCase().replace(/\s+/g, '-')}">${kelurahan}</option>`);
+                        kelurahanSelect.append(`<option value="${kelurahan}">${kelurahan}</option>`);
                     });
                 }
                 
