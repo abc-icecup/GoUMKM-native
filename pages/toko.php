@@ -55,13 +55,12 @@
             </div>
             
             <div class="store-description">
-                <textarea class="description-input" placeholder="Deskripsi Toko / Usaha"></textarea>
+                <textarea class="description-input" placeholder="Deskripsi Toko / Usaha" readonly></textarea>
             </div>
             
-            <div class="categories">
+            <div class="business-category">
                 <button class="category-btn">Kategori</button>
-                <button class="category-btn">Kategori</button>
-                <button class="category-btn">Kategori</button>
+
             </div>
         </div>
 

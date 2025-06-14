@@ -127,12 +127,12 @@ body {
     background-color: #f9f9f9;
 }
 
-.categories {
+.business-category {
     display: flex;
     gap: 10px;
 }
 
-.category-btn {
+.business-category {
     padding: 8px 20px;
     border: 1px solid #ccc;
     border-radius: 20px;
@@ -239,6 +239,29 @@ body {
 .nav-btn:hover {
     background-color: #e7f1ff;
 }
+
+.description-input {
+    resize: none !important;
+    pointer-events: none; /* Membuat input tidak responsif terhadap mouse */
+    background-color: #f9f9f9; /* Agar tidak terlihat seperti 'disabled' abu-abu */
+    cursor: default;
+}
+
+.description-input {
+    resize: none; /* Tidak bisa di-resize manual */
+    pointer-events: none; /* Tidak bisa diklik atau difokus */
+    background-color: #f9f9f9;
+    color: #333;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    min-height: 80px;
+}
+
+
+
+
 
 /* .logo-umkm { */
     /* max-height: 90px; atau sesuaikan */
