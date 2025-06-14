@@ -1,6 +1,6 @@
 <?php
-$id_user_toko = $_GET['id_user']; // misal dari URL
-$result = $conn->query("SELECT * FROM produk WHERE id_user = $id_user_toko");
+// $id_user_toko = $_GET['id_user']; // misal dari URL
+// $result = $conn->query("SELECT * FROM produk WHERE id_user = $id_user_toko");
 
 ?>
 

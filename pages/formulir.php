@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
                     <?php if (!empty($data_lama['gambar'])): ?>
-                        <img src="uploads/<?= htmlspecialchars($data_lama['gambar']) ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old">
+                        <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_lama['gambar']) ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old">
                     <?php endif; ?>
                     
                     <input type="file" id="business-photo" name="business-photo" accept="image/*">

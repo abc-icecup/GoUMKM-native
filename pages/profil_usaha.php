@@ -3,10 +3,10 @@ session_start();
 require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
 
 // Pastikan user sudah login
-// if (!isset($_SESSION['id_user'])) {
-//     header("Location: masuk.php");
-//     exit;
-// }
+if (!isset($_SESSION['id_user'])) {
+    header("Location: masuk.php");
+    exit;
+}
 
 // Ambil id_profil berdasarkan id_user yang sedang login
 $id_user = $_SESSION['id_user'];
@@ -17,10 +17,10 @@ $result = $query->get_result();
 $data_profil = $result->fetch_assoc();
 
 // 3. Jika user belum mengisi profil usaha, redirect ke formulir
-// if (!$data_profil) {
-//     header("Location: formulir.php");
-//     exit;
-// }
+if (!$data_profil) {
+    header("Location: formulir.php");
+    exit;
+}
 
 $id_profil = $data_profil['id_profil'];
 
@@ -56,7 +56,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
         <div class="profile-icon">
             <a href="profil_usaha.php">
                 <?php if (!empty($data_profil['gambar'])): ?>
-                    <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
+                    <img src="../user_img/foto_usaha/ <?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
                 <?php else: ?>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
@@ -82,7 +82,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                 <div class="form-content">
                     <div class="image-placeholder">
                         <?php if (!empty($data_profil['gambar'])): ?>
-                            <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Gambar Usaha" class="img-preview">
+                            <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Gambar Usaha" class="img-preview">
                         <?php else: ?>
                             <svg class="image-icon" viewBox="0 0 24 24">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -148,7 +148,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                         <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
                         <div class="product-image">
                             <?php if (!empty($produk['gambar'])): ?>
-                                <img src="../uploads/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
+                                <img src="../user_img/foto_produk/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
                             <?php else: ?>
                                 <svg viewBox="0 0 24 24">
                                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>

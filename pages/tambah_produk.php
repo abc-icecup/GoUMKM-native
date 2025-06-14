@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Proses upload gambar
     $gambar = $data_produk['gambar'] ?? null;
     if (isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] === UPLOAD_ERR_OK) {
-        $targetDir = "../uploads/";
+        $targetDir = "../user_img/foto_produk/";
         if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
 
         $ext = pathinfo($_FILES['business-photo']['name'], PATHINFO_EXTENSION);
