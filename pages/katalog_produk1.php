@@ -1,11 +1,3 @@
-<?php
-
-session_start();
-require_once '../config/koneksi.php'; // File koneksi database Anda
-
-?>
-
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -15,16 +7,20 @@ require_once '../config/koneksi.php'; // File koneksi database Anda
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="../css/katalog_produk.css">
 </head>
+
 <body>
     <div class="header">
-        <div class="logo">Logo UMKM</div>
+        <div class="logo">
+            <div class="logo-icon">Go</div>
+            UMKM
+        </div>
         <div class="search-container">
             <input type="text" class="search-input" placeholder="Cari produk atau jasa...">
             <button class="search-btn">Search</button>
         </div>
         <div class="nav-buttons">
             <button class="nav-btn">Masuk</button>
-            <button class="nav-btn">Daftar</button>
+            <button class="nav-btn primary">Daftar</button>
         </div>
     </div>
 
@@ -48,7 +44,7 @@ require_once '../config/koneksi.php'; // File koneksi database Anda
             
             <div class="shop-info">
                 <div class="shop-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <rect x="3" y="3" width="18" height="18" rx="2" stroke="#666" stroke-width="2"/>
                         <circle cx="9" cy="9" r="2" stroke="#666" stroke-width="2"/>
                         <path d="M21 15.5c-1.4-1.4-3.1-2.3-5.1-2.3s-3.7.9-5.1 2.3" stroke="#666" stroke-width="2"/>
@@ -58,9 +54,10 @@ require_once '../config/koneksi.php'; // File koneksi database Anda
             </div>
 
             <div class="product-description">
-                <div class="description-label">Deskripsi Produk</div>
+                <div class="description-label">Kategori</div>
+                <div class="category-tag">kategori</div>
                 <div class="description-text">
-                    Deskripsi produk akan ditampilkan di sini...
+                    Deskripsi Produk
                 </div>
             </div>
 
@@ -122,8 +119,6 @@ require_once '../config/koneksi.php'; // File koneksi database Anda
                     `);
                 }, 1000);
             });
-
-            // Keep original placeholder content as in the image
         });
     </script>
 </body>
