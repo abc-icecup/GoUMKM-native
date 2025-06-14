@@ -144,7 +144,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                 if ($produk_result->num_rows > 0):
                     while ($produk = $produk_result->fetch_assoc()):
                 ?>
-                        <div class="product-card">
+                        <div class="product-card data-id="<?= $produk['id_produk'] ?>">
                             <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
                             <div class="product-image">
                                 <?php if (!empty($produk['gambar'])): ?>
@@ -172,53 +172,65 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
     </div>
 
     <script>
-        $(document).ready(function() {
-            // Handle search functionality
-            $('.search-btn').click(function() {
-                const searchTerm = $('.search-input').val();
-                if (searchTerm.trim()) {
+        $(document).ready(function () {
+            // Pencarian
+            $('.search-btn').on('click', function () {
+                const searchTerm = $('.search-input').val().trim();
+                if (searchTerm) {
                     alert('Mencari: ' + searchTerm);
                 }
             });
 
-            // Handle enter key in search
-            $('.search-input').keypress(function(e) {
+            $('.search-input').on('keypress', function (e) {
                 if (e.which === 13) {
                     $('.search-btn').click();
                 }
             });
 
-            // Handle profile icon click
-            $('.profile-icon').click(function() {
+            // Klik ikon profil
+            $('.profile-icon').on('click', function () {
                 alert('Profile menu diklik');
             });
 
-            // // Handle edit icon click
-            // $('.edit-icon').click(function() {
-            //     alert('Edit form diklik');
-            // });
-
-            // Handle delete product buttons
-            $('.delete-btn').click(function(e) {
+            // Hapus produk (pakai AJAX ke backend)
+            $('.products-grid').on('click', '.delete-btn', function (e) {
                 e.stopPropagation();
-                if (confirm('Hapus produk ini?')) {
-                    $(this).closest('.product-card').fadeOut(300, function() {
-                        $(this).remove();
-                    });
-                }
+
+                if (!confirm('Hapus produk ini?')) return;
+
+                const card = $(this).closest('.product-card');
+                const id = card.data('id');
+
+                $.ajax({
+                    url: 'hapus_produk.php',
+                    method: 'GET',
+                    data: { id },
+                    success: function (res) {
+                        const json = JSON.parse(res);
+                        if (json.status === 'success') {
+                            card.fadeOut(300, () => card.remove());
+                        } else {
+                            alert('Gagal menghapus produk.');
+                        }
+                    },
+                    error: function () {
+                        alert('Terjadi kesalahan saat menghapus.');
+                    }
+                });
             });
 
-            // Handle add product click
-            $('.add-product').click(function() {
-                alert('Tambah produk baru');
+            // Tambah produk
+            $('.add-product').on('click', function () {
+                window.location.href = 'tambah_produk.php';
             });
 
-            // Handle product card click
-            $('.product-card').click(function() {
-                const productName = $(this).find('.product-name').text();
-                alert('Produk diklik: ' + productName);
+            // Klik produk: redirect ke katalog
+            $('.products-grid').on('click', '.product-card', function () {
+                const id = $(this).data('id');
+                window.location.href = 'katalog_produk.php?id=' + id;
             });
         });
     </script>
+
 </body>
 </html>
