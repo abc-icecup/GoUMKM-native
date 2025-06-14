@@ -3,10 +3,10 @@ session_start();
 require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
 
 // Pastikan user sudah login
-if (!isset($_SESSION['id_user'])) {
-    header("Location: masuk.php");
-    exit;
-}
+// if (!isset($_SESSION['id_user'])) {
+//     header("Location: masuk.php");
+//     exit;
+// }
 
 // Ambil id_profil berdasarkan id_user yang sedang login
 $id_user = $_SESSION['id_user'];
@@ -17,10 +17,10 @@ $result = $query->get_result();
 $data_profil = $result->fetch_assoc();
 
 // 3. Jika user belum mengisi profil usaha, redirect ke formulir
-if (!$data_profil) {
-    header("Location: formulir.php");
-    exit;
-}
+// if (!$data_profil) {
+//     header("Location: formulir.php");
+//     exit;
+// }
 
 $id_profil = $data_profil['id_profil'];
 
@@ -126,77 +126,49 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 
         <div class="products-section">
             <div class="products-grid">
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="add-product">
+
+                <!-- Tombol tambah produk -->
+                <a href="tambah_produk.php" class="add-product" style="text-decoration: none;">
                     <div class="add-icon">+</div>
                     <div class="add-text">Tambah Produk</div>
-                </div>
+                </a>
+
+                <?php
+                // Ambil produk berdasarkan id_profil (yang sudah kamu ambil sebelumnya)
+                $produk_stmt = $conn->prepare("SELECT * FROM produk WHERE id_profil = ?");
+                $produk_stmt->bind_param("i", $id_profil);
+                $produk_stmt->execute();
+                $produk_result = $produk_stmt->get_result();
+
+                // Cek apakah ada produk
+                if ($produk_result->num_rows > 0):
+                    while ($produk = $produk_result->fetch_assoc()):
+                ?>
+                        <div class="product-card">
+                            <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
+                            <div class="product-image">
+                                <?php if (!empty($produk['gambar'])): ?>
+                                    <img src="../uploads/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
+                                <?php else: ?>
+                                    <svg viewBox="0 0 24 24">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                                        <polyline points="21,15 16,10 5,21"/>
+                                    </svg>
+                                <?php endif; ?>
+                            </div>
+                            <div class="product-name"><?= htmlspecialchars($produk['nama_produk']) ?></div>
+                            <div class="product-price">Rp. <?= number_format($produk['harga'], 0, ',', '.') ?></div>
+                        </div>
+                <?php
+                    endwhile;
+                else:
+                ?>
+                    <p style="margin: 0; white-space: nowrap; display: flex; align-items: center; height:auto;">Belum ada produk. Silakan tambah produk pertama Anda.</p>
+                <?php endif; ?>
             </div>
         </div>
+
     </div>
 
     <script>

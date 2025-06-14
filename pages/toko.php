@@ -1,3 +1,9 @@
+<?php
+$id_user_toko = $_GET['id_user']; // misal dari URL
+$result = $conn->query("SELECT * FROM produk WHERE id_user = $id_user_toko");
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
