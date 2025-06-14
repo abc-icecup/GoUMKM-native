@@ -23,8 +23,8 @@ if ($result->num_rows === 0) {
 // Proses form tambah produk
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_user = $_SESSION['id_user'];
-    $nama_produk = $_POST['business-name'] ?? '';
-    $harga = $_POST['owner-name'] ?? '';
+    $nama_produk = $_POST['product-name'] ?? '';
+    $harga = $_POST['price'] ?? '';
     $gambar = $_POST['business-photo'] ??'';
     $deskripsi = $_POST['business-description'] ?? '';
     $link_whatsapp = $_POST['whatsapp-link'] ?? '';
@@ -121,17 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="input-group">
-                    <label class="form-label" for="business-name">Nama Produk </label>
-                    <input type="text" class="form-input" id="business-name" name="business-name" placeholder="Masukkan nama Produk" required>
-                    <div class="validation-message" id="business-name-error">Nama Produk  harus diisi</div>
+                    <label class="form-label" for="product-name">Nama Produk </label>
+                    <input type="text" class="form-input" id="product-name" name="product-name" placeholder="Masukkan nama Produk" required>
+                    <div class="validation-message" id="product-name-error">Nama Produk  harus diisi</div>
                 </div>
             </div>
 
             <div class="input-row">
                 <div class="input-group">
-                    <label class="form-label" for="owner-name">Harga(Rp.)</label>
-                    <input type="text" class="form-input" id="owner-name" name="owner-name" placeholder="Masukkan Harga " required>
-                    <div class="validation-message" id="owner-name-error">Nama produk  harus diisi</div>
+                    <label class="form-label" for="price">Harga(Rp.)</label>
+                    <input type="text" class="form-input" id="price" name="price" placeholder="Masukkan Harga " required>
+                    <div class="validation-message" id="price-error">Nama produk  harus diisi</div>
                 </div>
             
             <div class="input-group full-width">
@@ -219,12 +219,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Real-time validation
-            $('#business-name').on('blur', function() {
-                validateField('business-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
+            $('#product-name').on('blur', function() {
+                validateField('product-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
             });
 
-            $('#owner-name').on('blur', function() {
-                validateField('owner-name', val => val.length >= 2, 'Harga(Rp.)');
+            $('#price').on('blur', function() {
+                validateField('price', val => val.length >= 2, 'Harga(Rp.)');
             });
 
             $('#business-category').on('change', function() {
@@ -252,8 +252,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $('.message').hide();
                 
                 // Validate all fields
-                const isBusinessNameValid = validateField('business-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
-                const isOwnerNameValid = validateField('owner-name', val => val.length >= 2, 'Harga(Rp.)');
+                const isProductNameValid = validateField('product-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
+                const isPriceValid = validateField('price', val => val.length >= 2, 'Harga(Rp.)');
                 const isCategoryValid = validateField('business-category', val => val !== '', 'Kategori Produk harus dipilih');
                 const isDescriptionValid = validateField('business-description', val => val.length >= 10, 'Deskripsi minimal 10 karakter');
                 
@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     validateField('whatsapp-link', () => false, 'Format: https://wa.me/628123456789');
                 }
 
-                if (!isBusinessNameValid || !isOwnerNameValid || !isCategoryValid || !isDescriptionValid || !isWhatsappValid) {
+                if (!isProductNameValid || !isPriceValid || !isCategoryValid || !isDescriptionValid || !isWhatsappValid) {
                     showError('Silakan perbaiki kesalahan pada form');
                     return;
                 }
