@@ -2,6 +2,7 @@
 session_start();
 require_once '../config/koneksi.php'; // file koneksi ke database
 
+$id_user = $_SESSION['id_user'];
 $is_edit = isset($_GET['edit']) && $_GET['edit'] === 'true';
 
 // Cek login
@@ -11,13 +12,24 @@ if (!isset($_SESSION['id_user'])) {
 }
 
 // Cek apakah user sudah punya profil usaha
-$stmt = $conn->prepare("SELECT 1 FROM profil_usaha WHERE id_user = ?");
+$stmt = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
 $stmt->bind_param("i", $id_user);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     die("Silakan isi profil usaha terlebih dahulu sebelum menambahkan produk.");
+}
+$id_profil = $result->fetch_assoc()['id_profil'];
+
+// Jika edit, ambil data produk
+$data_produk = [];
+if ($is_edit && isset($_GET['id_produk'])) {
+    $stmt = $conn->prepare("SELECT * FROM produk WHERE id_produk = ? AND id_user = ?");
+    $stmt->bind_param("ii", $_GET['id_produk'], $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data_produk = $result->fetch_assoc();
 }
 
 // Proses form tambah produk
@@ -33,12 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validasi sederhana
     if (strlen($nama_produk) < 2 || strlen($deskripsi) < 10) {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Validasi gagal.']);
+        echo json_encode(['status' => 'error', 'message' => 'Validasi gagal, masukkan nama produk dan deskripsi yang lebih panjang']);
         exit;
     }
 
     // Proses upload gambar
-    $gambar = null;
+    $gambar = $data_produk['gambar'] ?? null;
     if (isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] === UPLOAD_ERR_OK) {
         $targetDir = "../uploads/";
         if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
@@ -56,25 +68,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Simpan ke database
-    $stmt = $conn->prepare("INSERT INTO produk (id_user, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssss", $id_user, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+
+    // Simpan ke database (edit atau insert)
+    if ($is_edit && isset($_GET['id_produk'])) {
+        $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, harga=?, kategori=?, deskripsi=?, whatsapp_link=?, gambar=? WHERE id_produk=? AND id_user=?");
+        $stmt->bind_param("ssssssii", $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar, $_GET['id_produk'], $id_user);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO produk (id_user, id_profil, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iissssss", $id_user, $id_profil, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+    }
 
     if ($stmt->execute()) {
-        header('Location: katalog_produk.php '); // Redirect setelah sukses
+        header('Location: profil_usaha.php'); // Redirect setelah sukses
     } else {
         echo "Query erorr : " . $stmt->error;
-
-    // Simpan ke database
-    if ($is_edit) {
-        $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
-        $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
-    } else {
-        $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
-    }
 }
-
 ?>
 
 
