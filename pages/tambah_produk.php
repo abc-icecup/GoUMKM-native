@@ -23,13 +23,22 @@ if ($result->num_rows === 0) {
 // Proses form tambah produk
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_user = $_SESSION['id_user'];
-
     $nama_produk = $_POST['business-name'] ?? '';
     $harga = $_POST['owner-name'] ?? '';
-    $kategori = $_POST['business-category'] ?? '';
+    $gambar = $_POST['business-photo'] ??'';
     $deskripsi = $_POST['business-description'] ?? '';
-    $whatsapp = $_POST['whatsapp-link'] ?? '';
-}
+    $link_whatsapp = $_POST['whatsapp-link'] ?? '';
+    $id_kategori = $_POST['business-category'] ?? '';
+    $id_profil = $_POST['id_profil'] ?? '';
+
+    // Ambil id_profil
+    $stmt = $conn->prepare("SELECT id FROM profil_usaha WHERE id_user = ?");
+    $stmt->bind_param("i", $id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+    $id_profil = $data['id'] ?? null;
+
     // Validasi sederhana
     if (strlen($nama_produk) < 2 || strlen($deskripsi) < 10) {
         http_response_code(400);
@@ -57,23 +66,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Simpan ke database
-    $stmt = $conn->prepare("INSERT INTO produk (id_user, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssss", $id_user, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+    $stmt = $conn->prepare("INSERT INTO produk (id_user, nama_produk, harga, gambar, deskripsi, whatsapp_link, id_kategori, id_profil) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("isssssss", $id_user, $nama_produk, $harga, $gambar, $deskripsi, $link_whatsapp, $id_kategori, $id_profil);
 
     if ($stmt->execute()) {
+        if ($is_edit) {
         header('Location: katalog_produk.php '); // Redirect setelah sukses
+        exit;
+        }
     } else {
-        echo "Query erorr" : . $stmt->error;
-
-    // Simpan ke database
-    if ($is_edit) {
-        $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
-        $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
-    } else {
-        $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
+        echo "Query erorr:" . $stmt->error;
     }
 }
+    
 
 ?>
 
@@ -83,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GoUMKM - Tambahkan Produk Anda</title>
+    <title>GoUMKM - Formulir Profil Usaha</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
    <link rel="stylesheet" href="../css/tambah_produk.css">
@@ -106,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span id="error-text">Terjadi kesalahan. Silakan periksa kembali form Anda.</span>
         </div>
 
-        <form id="business-profile-form" enctype="multipart/form-data">
+        <form id="business-profile-form" enctype="multipart/form-data" method="POST" action="">
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
                     <input type="file" id="business-photo" accept="image/*">
@@ -128,18 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="text" class="form-input" id="owner-name" name="owner-name" placeholder="Masukkan Harga " required>
                     <div class="validation-message" id="owner-name-error">Nama produk  harus diisi</div>
                 </div>
-                
-                <div class="input-group">
-                    <label class="form-label" for="business-category">Kategori Produk </label>
-                    <select class="form-select" id="business-category" name="business-category" required>
-                        <option value="Makanan dan Minuman ">Makanan dan Minuman </option>
-                        <option value="Fashion">Fashion</option>
-                        <option value="Kerajinan">Kerajinan</option>
-                        <option value="Produk Kecantikan">Produk Kecantikan</option>
-                        <option value="Pertanian dan Perkebunan">Pertanian dan Perkebunan </option>
-                    </select>
-                    <div class="validation-message" id="business-category-error">Kategori Produk harus dipilih</div>
-                </div>
+            
+            <div class="input-group full-width">
+                <label class="form-label" for="business-photo">Foto Produk</label>
+                <input type="file" class="form-input" id="business-photo" name="business-photo" accept="image/*" required>
+                <div class="validation-message" id="business-photo-error">Foto produk harus diunggah</div>
             </div>
 
             <div class="input-group full-width">
@@ -153,6 +151,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="url" class="form-input" id="whatsapp-link" name="whatsapp-link" placeholder="https://wa.me/628123456789">
                 <div class="validation-message" id="whatsapp-link-error">Format link WhatsApp tidak valid</div>
             </div>
+
+                <div class="input-group">
+                    <label class="form-label" for="business-category">Kategori Produk </label>
+                    <select class="form-select" id="business-category" name="business-category" required>
+                        <option value="Makanan dan Minuman ">Makanan dan Minuman </option>
+                        <option value="Fashion">Fashion</option>
+                        <option value="Kerajinan">Kerajinan</option>
+                        <option value="Produk Kecantikan">Produk Kecantikan</option>
+                        <option value="Pertanian dan Perkebunan">Pertanian dan Perkebunan </option>
+                    </select>
+                    <div class="validation-message" id="business-category-error">Kategori Produk harus dipilih</div>
+                </div>
+            </div>
+
 
             <button type="submit" class="submit-btn" id="submit-btn">
                 <span id="btn-text">Simpan</span>
