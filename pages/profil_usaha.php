@@ -15,6 +15,13 @@ $query->bind_param("i", $id_user);
 $query->execute();
 $result = $query->get_result();
 $data_profil = $result->fetch_assoc();
+
+// 3. Jika user belum mengisi profil usaha, redirect ke formulir
+if (!$data_profil) {
+    header("Location: formulir.php");
+    exit;
+}
+
 $id_profil = $data_profil['id_profil'];
 
 // Saat menyimpan produk
