@@ -43,14 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_kategori = $_POST['business-category'] ?? '';
     $id_profil = $_POST['id_profil'] ?? '';
 
-    // Ambil id_profil
-    $stmt = $conn->prepare("SELECT id FROM profil_usaha WHERE id_user = ?");
-    $stmt->bind_param("i", $id_user);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_assoc();
-    $id_profil = $data['id'] ?? null;
-
     // Validasi sederhana
     if (strlen($nama_produk) < 2 || strlen($deskripsi) < 10) {
         http_response_code(400);
@@ -77,23 +69,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Simpan ke database
-    $stmt = $conn->prepare("INSERT INTO produk (id_user, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssss", $id_user, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+    // Simpan ke database (edit atau insert)
+    if ($is_edit && isset($_GET['id_produk'])) {
+        $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, harga=?, kategori=?, deskripsi=?, whatsapp_link=?, gambar=? WHERE id_produk=? AND id_user=?");
+        $stmt->bind_param("ssssssii", $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar, $_GET['id_produk'], $id_user);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO produk (id_user, id_profil, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iissssss", $id_user, $id_profil, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+    }
 
     if ($stmt->execute()) {
-        header('Location: profil_usaha.php '); // Redirect setelah sukses
+        header('Location: profil_usaha.php');
+        exit;
     } else {
-        echo "Query erorr : " . $stmt->error;
-
-    // Simpan ke database
-    if ($is_edit) {
-        $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
-        $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
-    } else {
-        $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
+        echo "Query error: " . $stmt->error;
     }
+
 }
 
 ?>
