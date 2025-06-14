@@ -144,22 +144,22 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                 if ($produk_result->num_rows > 0):
                     while ($produk = $produk_result->fetch_assoc()):
                 ?>
-                        <div class="product-card data-id="<?= $produk['id_produk'] ?>">
-                            <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
-                            <div class="product-image">
-                                <?php if (!empty($produk['gambar'])): ?>
-                                    <img src="../uploads/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
-                                <?php else: ?>
-                                    <svg viewBox="0 0 24 24">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                                        <polyline points="21,15 16,10 5,21"/>
-                                    </svg>
-                                <?php endif; ?>
-                            </div>
-                            <div class="product-name"><?= htmlspecialchars($produk['nama_produk']) ?></div>
-                            <div class="product-price">Rp. <?= number_format($produk['harga'], 0, ',', '.') ?></div>
+                    <div class="product-card" data-id="<?= $produk['id_produk'] ?>">
+                        <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
+                        <div class="product-image">
+                            <?php if (!empty($produk['gambar'])): ?>
+                                <img src="../uploads/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
+                            <?php else: ?>
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21,15 16,10 5,21"/>
+                                </svg>
+                            <?php endif; ?>
                         </div>
+                        <div class="product-name"><?= htmlspecialchars($produk['nama_produk']) ?></div>
+                        <div class="price">Rp. <?= number_format($produk['harga'], 0, ',', '.') ?></div>
+                    </div>
                 <?php
                     endwhile;
                 else:
