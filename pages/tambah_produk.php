@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         header('Location: katalog_produk.php '); // Redirect setelah sukses
     } else {
-        echo "Query erorr" : . $stmt->error;
+        echo "Query erorr : " . $stmt->error;
 
     // Simpan ke database
     if ($is_edit) {

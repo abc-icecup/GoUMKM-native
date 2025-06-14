@@ -8,14 +8,18 @@ if (!isset($_SESSION['id_user'])) {
     exit;
 }
 
+// Ambil id_profil berdasarkan id_user yang sedang login
 $id_user = $_SESSION['id_user'];
+$query = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
+$query->bind_param("i", $id_user);
+$query->execute();
+$result = $query->get_result();
+$data_profil = $result->fetch_assoc();
+$id_profil = $data_profil['id_profil'];
 
-// Ambil data profil usaha
-$stmt = $conn->prepare("SELECT * FROM profil_usaha WHERE id_user = ?");
-$stmt->bind_param("i", $id_user);
-$stmt->execute();
-$result = $stmt->get_result();
-$data_profil = $result->fetch_assoc(); // hasil bisa null jika belum mengisi
+// Saat menyimpan produk
+$stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 ?>
 
 
