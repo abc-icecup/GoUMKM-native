@@ -1,3 +1,11 @@
+<?php
+
+session_start();
+require_once '../config/koneksi.php'; // File koneksi database Anda
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
