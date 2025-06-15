@@ -251,8 +251,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!isProductNameValid || !isPriceValid || !isCategoryValid || !isDescriptionValid || !isWhatsappValid) {
                     showError('Silakan perbaiki kesalahan pada form');
-                    return;
+                    return false;
                 }
+
+                // Jika semua valid, submit form ke PHP
+                return true;
             });
 
             function showError(message) {

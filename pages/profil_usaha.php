@@ -25,8 +25,8 @@ if (!$data_profil) {
 $id_profil = $data_profil['id_profil'];
 
 // Saat menyimpan produk
-$stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
+// $stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
+// $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 ?>
 
 
@@ -56,7 +56,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
         <div class="profile-icon">
             <a href="profil_usaha.php">
                 <?php if (!empty($data_profil['gambar'])): ?>
-                    <img src="../user_img/foto_usaha/ <?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
+                    <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
                 <?php else: ?>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
@@ -148,7 +148,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                         <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
                         <div class="product-image">
                             <?php if (!empty($produk['gambar'])): ?>
-                                <img src="../user_img/foto_produk/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
+                                <img src="../user_img/foto_produk/<?= $id_user ?>/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
                             <?php else: ?>
                                 <svg viewBox="0 0 24 24">
                                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -229,6 +229,10 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                 const id = $(this).data('id');
                 window.location.href = 'katalog_produk.php?id=' + id;
             });
+            
+            if ($('.product-card').length === 0) {
+                $('.products-grid').html('<p>Tidak ada produk.</p>');
+            }
         });
     </script>
 
