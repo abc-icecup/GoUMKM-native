@@ -44,13 +44,11 @@
 
     <!-- Categories -->
     <section class="categories">
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
-        <button class="category-btn">Kategori</button>
+        <button class="product-category">Makanan dan Minuman</button>
+        <button class="product-category">Fashion</button>
+        <button class="product-category">Kerajinan</button>
+        <button class="product-category">Produk Kecantikan</button>
+        <button class="product-category">Pertanian dan Perkebunan</button>
     </section>
 
     <!-- Products Grid -->
@@ -123,9 +121,9 @@
             });
 
             // Category buttons interaction
-            $('.category-btn').click(function() {
+            $('.product-category').click(function() {
                 // Remove active state from all buttons
-                $('.category-btn').css({
+                $('.product-category').css({
                     'background-color': 'white',
                     'border-color': '#dee2e6',
                     'color': '#495057'
@@ -177,7 +175,7 @@
             // });
 
             // Category hover effects
-            $('.category-btn').hover(
+            $('.product-category').hover(
                 function() {
                     if ($(this).css('background-color') === 'rgb(255, 255, 255)' || $(this).css('background-color') === 'white') {
                         $(this).css({

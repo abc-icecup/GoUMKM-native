@@ -17,7 +17,7 @@
         </div>
         
         <div class="search-container">
-            <select class="category-select" id="categorySelect">
+            <select class="product_category" id="categorySelect">
                 <option value="">Kategori</option>
             </select>
             <input type="text" class="search-input" placeholder="nama produk" id="searchInput">
