@@ -2,21 +2,20 @@
 session_start();
 require_once '../config/koneksi.php'; // file koneksi ke database
 
-$id_user = $_SESSION['id_user'];
-$is_edit = isset($_GET['edit']) && $_GET['edit'] === 'true';
-
 // Cek login
 if (!isset($_SESSION['id_user'])) {
     header('Location: masuk.php');
     exit;
 }
 
+$id_user = $_SESSION['id_user'];
+$is_edit = isset($_GET['edit']) && $_GET['edit'] === 'true';
+
 // Cek apakah user sudah punya profil usaha
 $stmt = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
 $stmt->bind_param("i", $id_user);
 $stmt->execute();
 $result = $stmt->get_result();
-
 if ($result->num_rows === 0) {
     die("Silakan isi profil usaha terlebih dahulu sebelum menambahkan produk.");
 }
@@ -25,8 +24,9 @@ $id_profil = $result->fetch_assoc()['id_profil'];
 // Jika edit, ambil data produk
 $data_produk = [];
 if ($is_edit && isset($_GET['id_produk'])) {
+    $id_produk = $_GET['id_produk'];
     $stmt = $conn->prepare("SELECT * FROM produk WHERE id_produk = ? AND id_user = ?");
-    $stmt->bind_param("ii", $_GET['id_produk'], $id_user);
+    $stmt->bind_param("ii", $id_produk, $id_user);
     $stmt->execute();
     $result = $stmt->get_result();
     $data_produk = $result->fetch_assoc();
@@ -34,42 +34,35 @@ if ($is_edit && isset($_GET['id_produk'])) {
 
 // Proses form tambah produk
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_user = $_SESSION['id_user'];
     $nama_produk = $_POST['product-name'] ?? '';
-    $harga = $_POST['price'] ?? '';
-    $gambar = $_POST['business-photo'] ??'';
+    $harga = $_POST['price'] ?? 0;
     $deskripsi = $_POST['business-description'] ?? '';
-    $link_whatsapp = $_POST['whatsapp-link'] ?? '';
-    $id_kategori = $_POST['business-category'] ?? '';
-    $id_profil = $_POST['id_profil'] ?? '';
+    $kategori = $_POST['business-category'] ?? '';
+    $whatsapp = $_POST['whatsapp-link'] ?? '';
 
     // Validasi sederhana
     if (strlen($nama_produk) < 2 || strlen($deskripsi) < 10) {
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'Validasi gagal, masukkan nama produk dan deskripsi yang lebih panjang']);
-        exit;
+        die("Nama dan deskripsi produk tidak valid.");
     }
 
     // Proses upload gambar
     $gambar = $data_produk['gambar'] ?? null;
     if (isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] === UPLOAD_ERR_OK) {
-        $targetDir = "../uploads/";
-        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+        $folder = "../user_img/foto_produk/$id_user/";
+        if (!is_dir($folder)) mkdir($folder, 0755, true);
 
         $ext = pathinfo($_FILES['business-photo']['name'], PATHINFO_EXTENSION);
-        $fileName = uniqid('produk_') . '.' . $ext;
-        $filePath = $targetDir . $fileName;
+        $file_name = 'produk_' . time() . '.' . $ext;
+        $full_path = $folder . $file_name;
 
-        if (move_uploaded_file($_FILES['business-photo']['tmp_name'], $filePath)) {
-            $gambar = $fileName;
+        if (move_uploaded_file($_FILES['business-photo']['tmp_name'], $full_path)) {
+            $gambar = "$id_user/$file_name"; // Simpan path relatif dari folder foto_produk
         } else {
-            http_response_code(500);
-            echo json_encode(['status' => 'error', 'message' => 'Upload gambar gagal.']);
-            exit;
+            die("Gagal mengupload gambar.");
         }
     }
 
-    // Simpan ke database (edit atau insert)
+    // Simpan ke database
     if ($is_edit && isset($_GET['id_produk'])) {
         $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, harga=?, kategori=?, deskripsi=?, whatsapp_link=?, gambar=? WHERE id_produk=? AND id_user=?");
         $stmt->bind_param("ssssssii", $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar, $_GET['id_produk'], $id_user);
@@ -84,11 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Query error: " . $stmt->error;
     }
-
 }
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="id">
@@ -110,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <div class="success-message message" id="success-message">
             <i class="fas fa-check-circle"></i>
-            <span>Produk Anda  berhasil disimpan!</span>
+            <span>Produk Anda berhasil disimpan!</span>
         </div>
         
         <div class="error-message message" id="error-message">
@@ -121,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form id="business-profile-form" enctype="multipart/form-data" method="POST" action="">
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
-                    <input type="file" id="business-photo" accept="image/*">
+                    <input type="file" id="business-photo" name="business-photo" accept="image/*" required>
                     <i class="fas fa-camera" id="camera-icon"></i>
                     <img class="photo-preview" id="photo-preview" alt="Preview">
                     <div class="tooltip">Upload foto produk </div>
@@ -130,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="input-group">
                     <label class="form-label" for="product-name">Nama Produk </label>
                     <input type="text" class="form-input" id="product-name" name="product-name" placeholder="Masukkan nama Produk" required>
-                    <div class="validation-message" id="product-name-error">Nama Produk  harus diisi</div>
+                    <div class="validation-message" id="product-name-error">Nama Produk harus diisi</div>
                 </div>
             </div>
 
@@ -138,26 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="input-group">
                     <label class="form-label" for="price">Harga(Rp.)</label>
                     <input type="text" class="form-input" id="price" name="price" placeholder="Masukkan Harga " required>
-                    <div class="validation-message" id="price-error">Nama produk  harus diisi</div>
+                    <div class="validation-message" id="price-error">Harga harus diisi</div>
                 </div>
-            
-            <div class="input-group full-width">
-                <label class="form-label" for="business-photo">Foto Produk</label>
-                <input type="file" class="form-input" id="business-photo" name="business-photo" accept="image/*" required>
-                <div class="validation-message" id="business-photo-error">Foto produk harus diunggah</div>
-            </div>
-
-            <div class="input-group full-width">
-                <label class="form-label" for="business-description">Deskripsi Produk </label>
-                <textarea class="form-textarea" id="business-description" name="business-description" placeholder="Ceritakan tentang Produk  Anda..." required></textarea>
-                <div class="validation-message" id="business-description-error">Deskripsi Produk  harus diisi</div>
-            </div>
-
-            <div class="input-group full-width">
-                <label class="form-label" for="whatsapp-link">Link WhatsApp</label>
-                <input type="url" class="form-input" id="whatsapp-link" name="whatsapp-link" placeholder="https://wa.me/628123456789">
-                <div class="validation-message" id="whatsapp-link-error">Format link WhatsApp tidak valid</div>
-            </div>
 
                 <div class="input-group">
                     <label class="form-label" for="business-category">Kategori Produk </label>
@@ -172,6 +144,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
+            <div class="input-group full-width">
+                <label class="form-label" for="business-description">Deskripsi Produk </label>
+                <textarea class="form-textarea" id="business-description" name="business-description" placeholder="Ceritakan tentang Produk  Anda..." required></textarea>
+                <div class="validation-message" id="business-description-error">Deskripsi Produk  harus diisi</div>
+            </div>
+
+            <div class="input-group full-width">
+                <label class="form-label" for="whatsapp-link">Link WhatsApp</label>
+                <input type="url" class="form-input" id="whatsapp-link" name="whatsapp-link" placeholder="https://wa.me/628123456789">
+                <div class="validation-message" id="whatsapp-link-error">Format link WhatsApp tidak valid</div>
+            </div>
 
             <button type="submit" class="submit-btn" id="submit-btn">
                 <span id="btn-text">Simpan</span>
@@ -253,11 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Form submission
             $('#business-profile-form').on('submit', function(e) {
-                e.preventDefault();
-                
-                // Hide previous messages
-                $('.message').hide();
-                
                 // Validate all fields
                 const isProductNameValid = validateField('product-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
                 const isPriceValid = validateField('price', val => val.length >= 2, 'Harga(Rp.)');
@@ -273,50 +251,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!isProductNameValid || !isPriceValid || !isCategoryValid || !isDescriptionValid || !isWhatsappValid) {
                     showError('Silakan perbaiki kesalahan pada form');
-                    return;
+                    return false;
                 }
 
-                // Show loading state
-                showLoading(true);
-
-                // Simulate API call
-                setTimeout(function() {
-                    showLoading(false);
-                    
-                    // Simulate success (90% success rate for demo)
-                    if (Math.random() > 0.1) {
-                        showSuccess();
-                        // Reset form after success
-                        setTimeout(function() {
-                            resetForm();
-                        }, 2000);
-                    } else {
-                        showError('Terjadi kesalahan server. Silakan coba lagi.');
-                    }
-                }, 2000);
+                // Jika semua valid, submit form ke PHP
+                return true;
             });
-
-            // Utility functions
-            function showLoading(show) {
-                if (show) {
-                    $('.form-container').addClass('loading');
-                    $('#btn-text').text('Menyimpan...');
-                    $('#loading-icon').show();
-                    $('#submit-btn').prop('disabled', true);
-                } else {
-                    $('.form-container').removeClass('loading');
-                    $('#btn-text').text('Simpan');
-                    $('#loading-icon').hide();
-                    $('#submit-btn').prop('disabled', false);
-                }
-            }
-
-            function showSuccess() {
-                $('#success-message').fadeIn();
-                setTimeout(function() {
-                    $('#success-message').fadeOut();
-                }, 4000);
-            }
 
             function showError(message) {
                 $('#error-text').text(message);
@@ -324,15 +264,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setTimeout(function() {
                     $('#error-message').fadeOut();
                 }, 5000);
-            }
-
-            function resetForm() {
-                $('#business-profile-form')[0].reset();
-                $('#photo-preview').hide();
-                $('#camera-icon').show();
-                $('#photo-upload').removeClass('has-image');
-                $('.form-input, .form-select, .form-textarea').removeClass('valid invalid');
-                $('.validation-message').hide();
             }
 
             // Character counter for description

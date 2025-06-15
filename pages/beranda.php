@@ -21,8 +21,8 @@
         </div>
         
         <div class="nav-buttons">
-            <a href="masuk.php" class="nav-btn">Masuk</a>
-            <a href="daftar.php" class="nav-btn">Daftar</a>
+            <a href="masuk.php" class="nav-btn" style="text-decoration: none;">Masuk</a>
+            <a href="daftar.php" class="nav-btn" style="text-decoration: none;">Daftar</a>
             <!-- <button class="nav-btn">Masuk</button>
             <button class="nav-btn">Daftar</button> -->
         </div>

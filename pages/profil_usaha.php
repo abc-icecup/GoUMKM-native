@@ -15,11 +15,18 @@ $query->bind_param("i", $id_user);
 $query->execute();
 $result = $query->get_result();
 $data_profil = $result->fetch_assoc();
+
+// 3. Jika user belum mengisi profil usaha, redirect ke formulir
+if (!$data_profil) {
+    header("Location: formulir.php");
+    exit;
+}
+
 $id_profil = $data_profil['id_profil'];
 
 // Saat menyimpan produk
-$stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
+// $stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
+// $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 ?>
 
 
@@ -49,7 +56,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
         <div class="profile-icon">
             <a href="profil_usaha.php">
                 <?php if (!empty($data_profil['gambar'])): ?>
-                    <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
+                    <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
                 <?php else: ?>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
@@ -75,7 +82,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
                 <div class="form-content">
                     <div class="image-placeholder">
                         <?php if (!empty($data_profil['gambar'])): ?>
-                            <img src="../uploads/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Gambar Usaha" class="img-preview">
+                            <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Gambar Usaha" class="img-preview">
                         <?php else: ?>
                             <svg class="image-icon" viewBox="0 0 24 24">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -119,127 +126,115 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 
         <div class="products-section">
             <div class="products-grid">
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="product-card">
-                    <button class="delete-btn">×</button>
-                    <div class="product-image">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
-                        </svg>
-                    </div>
-                    <div class="product-name">Nama Produk</div>
-                    <div class="product-price">Rp. -</div>
-                </div>
-                
-                <div class="add-product">
+
+                <!-- Tombol tambah produk -->
+                <a href="tambah_produk.php" class="add-product" style="text-decoration: none;">
                     <div class="add-icon">+</div>
                     <div class="add-text">Tambah Produk</div>
-                </div>
+                </a>
+
+                <?php
+                // Ambil produk berdasarkan id_profil (yang sudah kamu ambil sebelumnya)
+                $produk_stmt = $conn->prepare("SELECT * FROM produk WHERE id_profil = ?");
+                $produk_stmt->bind_param("i", $id_profil);
+                $produk_stmt->execute();
+                $produk_result = $produk_stmt->get_result();
+
+                // Cek apakah ada produk
+                if ($produk_result->num_rows > 0):
+                    while ($produk = $produk_result->fetch_assoc()):
+                ?>
+                    <div class="product-card" data-id="<?= $produk['id_produk'] ?>">
+                        <button class="delete-btn" onclick="if(confirm('Hapus produk ini?')) location.href='hapus_produk.php?id=<?= $produk['id_produk'] ?>'">×</button>
+                        <div class="product-image">
+                            <?php if (!empty($produk['gambar'])): ?>
+                                <img src="../user_img/foto_produk/<?= $id_user ?>/<?= htmlspecialchars($produk['gambar']) ?>" alt="<?= htmlspecialchars($produk['nama_produk']) ?>" />
+                            <?php else: ?>
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <polyline points="21,15 16,10 5,21"/>
+                                </svg>
+                            <?php endif; ?>
+                        </div>
+                        <div class="product-name"><?= htmlspecialchars($produk['nama_produk']) ?></div>
+                        <div class="price">Rp. <?= number_format($produk['harga'], 0, ',', '.') ?></div>
+                    </div>
+                <?php
+                    endwhile;
+                else:
+                ?>
+                    <p style="margin: 0; white-space: nowrap; display: flex; align-items: center; height:auto;">Belum ada produk. Silakan tambah produk pertama Anda.</p>
+                <?php endif; ?>
             </div>
         </div>
+
     </div>
 
     <script>
-        $(document).ready(function() {
-            // Handle search functionality
-            $('.search-btn').click(function() {
-                const searchTerm = $('.search-input').val();
-                if (searchTerm.trim()) {
+        $(document).ready(function () {
+            // Pencarian
+            $('.search-btn').on('click', function () {
+                const searchTerm = $('.search-input').val().trim();
+                if (searchTerm) {
                     alert('Mencari: ' + searchTerm);
                 }
             });
 
-            // Handle enter key in search
-            $('.search-input').keypress(function(e) {
+            $('.search-input').on('keypress', function (e) {
                 if (e.which === 13) {
                     $('.search-btn').click();
                 }
             });
 
-            // Handle profile icon click
-            $('.profile-icon').click(function() {
+            // Klik ikon profil
+            $('.profile-icon').on('click', function () {
                 alert('Profile menu diklik');
             });
 
-            // // Handle edit icon click
-            // $('.edit-icon').click(function() {
-            //     alert('Edit form diklik');
-            // });
-
-            // Handle delete product buttons
-            $('.delete-btn').click(function(e) {
+            // Hapus produk (pakai AJAX ke backend)
+            $('.products-grid').on('click', '.delete-btn', function (e) {
                 e.stopPropagation();
-                if (confirm('Hapus produk ini?')) {
-                    $(this).closest('.product-card').fadeOut(300, function() {
-                        $(this).remove();
-                    });
-                }
+
+                if (!confirm('Hapus produk ini?')) return;
+
+                const card = $(this).closest('.product-card');
+                const id = card.data('id');
+
+                $.ajax({
+                    url: 'hapus_produk.php',
+                    method: 'GET',
+                    data: { id },
+                    success: function (res) {
+                        const json = JSON.parse(res);
+                        if (json.status === 'success') {
+                            card.fadeOut(300, () => card.remove());
+                        } else {
+                            alert('Gagal menghapus produk.');
+                        }
+                    },
+                    error: function () {
+                        alert('Terjadi kesalahan saat menghapus.');
+                    }
+                });
             });
 
-            // Handle add product click
-            $('.add-product').click(function() {
-                alert('Tambah produk baru');
+            // Tambah produk
+            $('.add-product').on('click', function () {
+                window.location.href = 'tambah_produk.php';
             });
 
-            // Handle product card click
-            $('.product-card').click(function() {
-                const productName = $(this).find('.product-name').text();
-                alert('Produk diklik: ' + productName);
+            // Klik produk: redirect ke katalog
+            $('.products-grid').on('click', '.product-card', function () {
+                const id = $(this).data('id');
+                window.location.href = 'katalog_produk.php?id=' + id;
             });
+            
+            if ($('.product-card').length === 0) {
+                $('.products-grid').html('<p>Tidak ada produk.</p>');
+            }
         });
     </script>
+
 </body>
 </html>
