@@ -1,28 +1,28 @@
 <?php
-session_start();
-require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
+// session_start();
+// require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
 
-// Pastikan user sudah login
-if (!isset($_SESSION['id_user'])) {
-    header("Location: masuk.php");
-    exit;
-}
+// // Pastikan user sudah login
+// if (!isset($_SESSION['id_user'])) {
+//     header("Location: masuk.php");
+//     exit;
+// }
 
-// Ambil id_profil berdasarkan id_user yang sedang login
-$id_user = $_SESSION['id_user'];
-$query = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
-$query->bind_param("i", $id_user);
-$query->execute();
-$result = $query->get_result();
-$data_profil = $result->fetch_assoc();
+// // Ambil id_profil berdasarkan id_user yang sedang login
+// $id_user = $_SESSION['id_user'];
+// $query = $conn->prepare("SELECT id_profil FROM profil_usaha WHERE id_user = ?");
+// $query->bind_param("i", $id_user);
+// $query->execute();
+// $result = $query->get_result();
+// $data_profil = $result->fetch_assoc();
 
-// 3. Jika user belum mengisi profil usaha, redirect ke formulir
-if (!$data_profil) {
-    header("Location: formulir.php");
-    exit;
-}
+// // 3. Jika user belum mengisi profil usaha, redirect ke formulir
+// if (!$data_profil) {
+//     header("Location: formulir.php");
+//     exit;
+// }
 
-$id_profil = $data_profil['id_profil'];
+// $id_profil = $data_profil['id_profil'];
 
 // Saat menyimpan produk
 // $stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
@@ -53,17 +53,34 @@ $id_profil = $data_profil['id_profil'];
             <button class="search-btn">Search</button>
         </div>
         
-        <div class="profile-icon">
-            <a href="profil_usaha.php">
+        <div class="profile-container">
+            <div class="profile-icon" id="profileToggle">
                 <?php if (!empty($data_profil['gambar'])): ?>
                     <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
                 <?php else: ?>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
                         <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
                     </svg>
                 <?php endif; ?>
-            </a>
+            </div>
+
+            <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                <div class="profile-avatar">
+                    <?php if (!empty($data_profil['gambar'])): ?>
+                        <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
+                    <?php else: ?>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    <?php endif; ?>
+                </div>
+                <div class="profile-email"><?= htmlspecialchars($_SESSION['email']) ?></div>
+                <form method="POST" action="logout.php">
+                    <button type="submit" class="logout-btn">Log Out</button>
+                </form>
+            </div>
         </div>
     </header>
 
@@ -187,12 +204,38 @@ $id_profil = $data_profil['id_profil'];
                 }
             });
 
-            // Klik ikon profil
-            $('.profile-icon').on('click', function () {
-                alert('Profile menu diklik');
+            // Klik ikon profil → toggle dropdown
+            $('.profile-icon').on('click', function (e) {
+                e.preventDefault(); // Hindari redirect ke profil_usaha.php
+                e.stopPropagation(); // Mencegah klik ke dokumen
+
+                $('.profile-dropdown').fadeToggle(200);
             });
 
-            // Hapus produk (pakai AJAX ke backend)
+            // Klik di luar dropdown → tutup
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.profile-container').length) {
+                    $('.profile-dropdown').fadeOut(200);
+                }
+            });
+
+            // Klik tombol logout
+            $('.logout-btn').on('click', function () {
+                window.location.href = 'logout.php'; // pastikan kamu punya logout.php
+            });
+
+            // Tambah produk
+            $('.add-product').on('click', function () {
+                window.location.href = 'tambah_produk.php';
+            });
+
+            // Klik produk: redirect ke katalog
+            $('.products-grid').on('click', '.product-card', function () {
+                const id = $(this).data('id');
+                window.location.href = 'katalog_produk.php?id=' + id;
+            });
+
+            // Hapus produk
             $('.products-grid').on('click', '.delete-btn', function (e) {
                 e.stopPropagation();
 
@@ -219,22 +262,13 @@ $id_profil = $data_profil['id_profil'];
                 });
             });
 
-            // Tambah produk
-            $('.add-product').on('click', function () {
-                window.location.href = 'tambah_produk.php';
-            });
-
-            // Klik produk: redirect ke katalog
-            $('.products-grid').on('click', '.product-card', function () {
-                const id = $(this).data('id');
-                window.location.href = 'katalog_produk.php?id=' + id;
-            });
-            
+            // Jika tidak ada produk
             if ($('.product-card').length === 0) {
                 $('.products-grid').html('<p>Tidak ada produk.</p>');
             }
         });
-    </script>
+</script>
+
 
 </body>
 </html>
