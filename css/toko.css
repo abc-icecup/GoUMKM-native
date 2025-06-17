@@ -136,7 +136,8 @@ body {
     padding: 8px 20px;
     border: 1px solid #ccc;
     border-radius: 20px;
-    background-color: white;
+    background-color: #2c5aa0;
+    color: white;
     cursor: pointer;
 }
 

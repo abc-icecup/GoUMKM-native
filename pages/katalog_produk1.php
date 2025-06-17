@@ -1,3 +1,16 @@
+<?php
+
+session_start();
+require_once '../config/koneksi.php'
+
+
+
+
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -50,12 +63,14 @@
                         <path d="M21 15.5c-1.4-1.4-3.1-2.3-5.1-2.3s-3.7.9-5.1 2.3" stroke="#666" stroke-width="2"/>
                     </svg>
                 </div>
-                <span class="shop-name">Akun Toko</span>
+                <a href="toko.php" class="shop-name">Akun Toko</a>
+
+                
             </div>
 
             <div class="product-description">
                 <div class="description-label">Kategori</div>
-                <div class="category-tag">kategori</div>
+                <a href="kategori.php" class="category-tag">Kategori</a>
                 <div class="description-text">
                     Deskripsi Produk
                 </div>
@@ -67,9 +82,13 @@
                 </svg>
                 Beli
             </button>
+
+            
         </div>
     </div>
+    
 
+    
     <script>
         $(document).ready(function() {
             // Handle search functionality

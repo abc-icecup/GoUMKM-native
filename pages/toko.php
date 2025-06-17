@@ -1,6 +1,37 @@
 <?php
-// $id_user_toko = $_GET['id_user']; // misal dari URL
-// $result = $conn->query("SELECT * FROM produk WHERE id_user = $id_user_toko");
+
+session_start();
+require_once '../config/koneksi.php';
+
+// Cek login
+if (!isset($_SESSION['id_user'])) {
+    header('Location: masuk.php');
+    exit;
+}
+
+$id_user = $_SESSION['id_user'];
+
+// Ambil data profil usaha
+$stmt = $conn->prepare("SELECT * FROM profil_usaha WHERE id_user = ?");
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$data_usaha = $stmt->get_result()->fetch_assoc();
+
+// Jika profil belum ada, tampilkan placeholder saja (tidak exit)
+if (!$data_usaha) {
+    $data_usaha = [
+        'nama_toko' => 'Nama Toko',
+        'deskripsi' => 'Deskripsi Toko / Usaha'
+    ];
+    $produk_tersedia = false;
+} else {
+    // Ambil data produk dari profil usaha ini
+    $stmtProduk = $conn->prepare("SELECT * FROM produk WHERE id_profil = ?");
+    $stmtProduk->bind_param("i", $data_usaha['id_profil']);
+    $stmtProduk->execute();
+    $resultProduk = $stmtProduk->get_result();
+    $produk_tersedia = $resultProduk->num_rows > 0;
+}
 
 ?>
 
@@ -65,9 +96,9 @@
             </div>
             
             <div class="categories">
-                <button class="category-btn">Kategori</button>
+                <a href="kategori.php" class="category-btn">Kategori</a>
             </div>
-        </div>
+
 
         <!-- Products Grid -->
         <div class="products-section">
