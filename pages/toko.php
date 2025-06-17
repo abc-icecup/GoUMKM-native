@@ -1,7 +1,6 @@
 <?php
-
-session_start();
-require_once '../config/koneksi.php';
+require_once '../pages/init.php';
+include '../pages/header.php';
 
 // Cek login
 if (!isset($_SESSION['id_user'])) {

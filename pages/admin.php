@@ -12,7 +12,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 $query = "
     SELECT pu.id_profil, pu.nama_usaha, u.email, pu.status
     FROM profil_usaha pu
-    INNER JOIN users u ON pu.id_user = u.id_user
+    INNER JOIN users u ON pu.id_user = u.id_user;
 ";
 $result = $conn->query($query);
 $data_usaha = [];

@@ -23,9 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
-            echo "<pre>";
-            print_r($user);
-            echo "</pre>";
+            // PERINTAH DIBAWAH UNTUK MEMPERLIHATKAN ERRORNYA DIMANA
+            // echo "<pre>";
+            // print_r($user);
+            // echo "</pre>";
 
             if (password_verify($password, $user['password'])) {
                 echo "Password cocok<br>";
@@ -53,10 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 exit();
             } else {
-                // password salah
-                echo "Password TIDAK cocok<br>";
-                echo "Password yang dimasukkan: $password<br>";
-                echo "Password di database: " . $user['password'] . "<br>";
+                // INI JUGA UNTUK MEMPERLIHATKAN ERROR
+                // echo "Password TIDAK cocok<br>";
+                // echo "Password yang dimasukkan: $password<br>";
+                // echo "Password di database: " . $user['password'] . "<br>";
                 $error = "Email atau password salah.";
             }
         } else {
@@ -79,9 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </head>
 <body>
-    <?php if (!empty($error)): ?>
-        <p style="color: red;"><?php echo $error; ?>INI ERROR WELL</p>
-    <?php endif; ?>
+    
 
     <div class="container">
         <div class="left-section">
@@ -172,8 +171,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return emailRegex.test(email);
             }
             
+            function showError(message) {
+                $('#error-text').text(message);
+                $('#error-message').fadeIn();
+                setTimeout(function() {
+                    $('#error-message').fadeOut();
+                }, 5000);
+            }
             // Smooth animations on load
             $('.container').hide().fadeIn(800);
+        
         });
     </script>
 </body>

@@ -1,8 +1,3 @@
-<?php
-require_once '../pages/init.php';
-include '../pages/header.php';
-?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,19 +5,21 @@ include '../pages/header.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoUMKM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="../css/pencarian.css">
+    <link rel="stylesheet" href="../css/kategori2.css">
 
 </head>
-
 <body>
     <!-- Header -->
-    <!-- <header class="header">
+    <header class="header">
         <div class="logo">
             <div class="logo-icon">🏪</div>
             GoUMKM
         </div>
         
         <div class="search-container">
+            <select class="product_category" id="categorySelect">
+                <option value="">Kategori</option>
+            </select>
             <input type="text" class="search-input" placeholder="nama produk" id="searchInput">
             <button class="search-btn" id="searchBtn">Search</button>
         </div>
@@ -31,7 +28,7 @@ include '../pages/header.php';
             <a href="#" class="btn">Masuk</a>
             <a href="#" class="btn btn-primary">Daftar</a>
         </div>
-    </header> -->
+    </header>
 
     <!-- Main Content -->
     <div class="container">

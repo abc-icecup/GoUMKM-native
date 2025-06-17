@@ -1,3 +1,8 @@
+<?php
+require_once '../pages/init.php';
+include '../pages/header.php';
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,7 +13,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
+    <!-- <header class="header">
         <div class="nav-left" >
             <a href="../pages/beranda.php">
                 <img src="../assets/img/image (2).png" alt="logo umkm" class="logo-umkm" >
@@ -22,11 +27,11 @@
         
         <div class="nav-buttons">
             <a href="masuk.php" class="nav-btn" style="text-decoration: none;">Masuk</a>
-            <a href="daftar.php" class="nav-btn" style="text-decoration: none;">Daftar</a>
+            <a href="daftar.php" class="nav-btn" style="text-decoration: none;">Daftar</a> -->
             <!-- <button class="nav-btn">Masuk</button>
             <button class="nav-btn">Daftar</button> -->
-        </div>
-    </header>
+        <!-- </div>
+    </header> -->
 
     <!-- Hero Section -->
     <section class="hero">

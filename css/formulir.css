@@ -45,6 +45,29 @@ body {
     color: #333;
 }
 
+/* .alert-box {
+    background-color: #fdecea;
+    color: #b71c1c;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    position: relative;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.alert-box .close-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b71c1c;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+} */
+
 .photo-upload-section {
     display: flex;
     align-items: center;
@@ -199,6 +222,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     margin: 20px 0 0 10px;
+    text-decoration: none;
 }
 
 .batal-btn:hover {
@@ -353,3 +377,8 @@ body {
     text-align: right;
     margin-top: 5px;
 }
+
+/* hanya untuk tes */
+/* body {
+    background-color: red; 
+} */

@@ -193,3 +193,12 @@ body {
         gap: 10px;
     }
 }
+
+.logo-umkm {
+    /* max-height: 90px; atau sesuaikan */
+    height: 30px;
+    /* width: auto; */
+    object-fit: contain;
+    background: none;
+    display: block;
+    }
