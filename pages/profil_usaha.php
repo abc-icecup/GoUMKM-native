@@ -268,8 +268,8 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
             //     $('.products-grid').html('<p>Tidak ada produk.</p>');
             // }
         });
-</script>
+    </script>
 
-
+    <?php include 'footer.php'; ?>
 </body>
 </html>

@@ -1,6 +1,14 @@
 <?php
-// pastikan session_start sudah dipanggil sebelumnya (di init.php)
+require_once 'init.php';
+
 $is_logged_in = isset($_SESSION['id_user']);
+$data_profil = $is_logged_in ? getUserIfExists($conn) : null;
+
+if ($is_logged_in && !$data_profil) {
+    session_unset();
+    session_destroy();
+    $is_logged_in = false;
+}
 ?>
 
 <style>

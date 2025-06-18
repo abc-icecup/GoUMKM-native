@@ -35,16 +35,18 @@ include '../pages/header.php';
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                Tunjukkan semangat bertumbuh,<br>
-                bersama kita membangun<br>
-                <strong>UMKM INDONESIA</strong>
+        <div class="hero-overlay">
+            <div class="hero-text-box">
+                <div class="hero-text">
+                    Tunjukkan semangat bertumbuh,<br>
+                    bersama kita membangun<br>
+                    <strong>UMKM INDONESIA</strong>
+                </div>
+                <?php if (!isset($_SESSION['id_user'])): ?>
+                    <a href="daftar.php" class="hero-btn">Ayo Daftarkan UMKM Anda >></a>
+                <?php endif; ?>
             </div>
-            <a href="daftar.php" class="hero-btn">Ayo Daftarkan UMKM Anda >></a>
-            <!-- <button class="hero-btn">Ayo Daftarkan UMKM Anda >></button> -->
         </div>
-        <div class="hero-image"></div>
     </section>
 
     <!-- Categories -->
@@ -251,5 +253,7 @@ include '../pages/header.php';
             );
         });
     </script>
+
+    <?php include 'footer.php'; ?>
 </body>
 </html>

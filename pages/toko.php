@@ -224,5 +224,7 @@ if (!$data_usaha) {
             });
         });
     </script>
+
+    <?php include 'footer.php'; ?>
 </body>
 </html>

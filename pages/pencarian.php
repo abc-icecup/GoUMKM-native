@@ -143,5 +143,7 @@ include '../pages/header.php';
             generateProducts();
         });
     </script>
+
+    <?php include 'footer.php'; ?>
 </body>
 </html>

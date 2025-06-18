@@ -62,7 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Validasi gambar
-    $gambar = null; // default kosong
+    if (!$upload_gambar_baru) {
+        $gambar = $_POST['gambar_lama'] ?? ($data_lama['gambar'] ?? null);
+    }
 
     $upload_gambar_baru = isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] !== UPLOAD_ERR_NO_FILE;
 
@@ -203,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="photo-upload" id="photo-upload">
                     <?php if ($is_edit && isset($data_lama['gambar'])): ?>
                         <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_lama['gambar']) ?>?v=<?= time() ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old">
-                        <input type="hidden" name="gambar_lama" value="<?= htmlspecialchars($data_lama['gambar']) ?>">
+                        <input type="hidden" name="gambar_lama" id="gambar_lama_hidden" value="<?= htmlspecialchars($data_lama['gambar']) ?>">
                     <?php endif; ?>
                     
                     <input type="file" id="business-photo" name="business-photo" accept="image/*">
@@ -476,7 +478,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     scrollToFirstError();
                     return;
                 }
-                
+
+                // DEBUG
+                const gambarLama = document.getElementById('gambar_lama_hidden');
+                console.log("DEBUG: gambar_lama yang terkirim =", gambarLama ? gambarLama.value : 'TIDAK ADA');
             });
 
             // Utility functions
