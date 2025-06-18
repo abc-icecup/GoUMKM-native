@@ -1,5 +1,5 @@
 <?php
-require_once 'init.php';
+require_once '../config/init.php';
 
 $is_logged_in = isset($_SESSION['id_user']);
 $data_profil = $is_logged_in ? getUserIfExists($conn) : null;

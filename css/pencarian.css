@@ -22,7 +22,7 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    color: #2c5aa0;
+    color: #205781;
     font-weight: bold;
     font-size: 18px;
 }
@@ -30,7 +30,7 @@ body {
 .logo-icon {
     width: 16px;
     height: 16px;
-    background-color: #2c5aa0;
+    background-color: #205781;
     margin-right: 8px;
     border-radius: 3px;
     display: flex;
@@ -73,7 +73,7 @@ body {
 }
 
 .search-btn {
-    background-color: #4a90e2;
+    background-color: #205781;
     color: white;
     border: none;
     padding: 8px 20px;
@@ -106,13 +106,13 @@ body {
 }
 
 .btn-primary {
-    background-color: #4a90e2;
+    background-color: #205781;
     color: white;
-    border-color: #4a90e2;
+    border-color: #205781;
 }
 
 .btn-primary:hover {
-    background-color: #357abd;
+    background-color: #205781;
 }
 
 /* Main Content */

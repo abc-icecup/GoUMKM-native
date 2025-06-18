@@ -1,7 +1,12 @@
 <?php
 session_start();
-unset($_SESSION['form_submitted']); // ✅ Reset session form
 require_once '../config/koneksi.php'; // sesuaikan path-nya jika perlu
+
+// Cek status form
+$status = isset($_SESSION['form_submitted']) ? $_SESSION['form_submitted'] : 'not set';
+
+// Baru hapus setelah dibaca
+unset($_SESSION['form_submitted']);
 
 // Pastikan user sudah login
 if (!isset($_SESSION['id_user'])) {
@@ -88,7 +93,10 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
     <div class="container">
         <div class="main-content">
             <div class="form-section">
-                <div class="form-header">
+            <?php if ($status === 'success'): ?>
+                <div class="alert alert-success">Profil berhasil disimpan!</div>
+            <?php endif; ?>
+            <div class="form-header">
                     <h2 class="form-title">Profil Usaha Anda</h2>
                     <a href="formulir.php?edit=true" class="edit-button" method="POST" enctype="multipart/form-data">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="20px" height="20px" class="edit-icon">
@@ -146,7 +154,7 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
             <div class="products-grid">
 
                 <!-- Tombol tambah produk -->
-                <a href="tambah_produk.php" class="add-product" style="text-decoration: none;">
+                <a href="tambah_produk.php?id_profil=<?= $id_profil ?>" class="add-product" style="text-decoration: none;">
                     <div class="add-icon">+</div>
                     <div class="add-text">Tambah Produk</div>
                 </a>
@@ -270,6 +278,6 @@ $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
         });
     </script>
 
-    <?php include 'footer.php'; ?>
+    <?php include '../Includes/footer.php'; ?>
 </body>
 </html>

@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama_produk = $_POST['product-name'] ?? '';
     $harga = $_POST['price'] ?? 0;
     $deskripsi = $_POST['business-description'] ?? '';
-    $kategori = $_POST['business-category'] ?? '';
+    $id_kategori = $_POST['product-category'] ?? '';
     $whatsapp = $_POST['whatsapp-link'] ?? '';
 
     // Validasi sederhana
@@ -65,10 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Simpan ke database
     if ($is_edit && isset($_GET['id_produk'])) {
         $stmt = $conn->prepare("UPDATE produk SET nama_produk=?, harga=?, kategori=?, deskripsi=?, whatsapp_link=?, gambar=? WHERE id_produk=? AND id_user=?");
-        $stmt->bind_param("ssssssii", $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar, $_GET['id_produk'], $id_user);
+        $stmt->bind_param("ssssssii", $nama_produk, $harga, $id_kategori, $deskripsi, $whatsapp, $gambar, $_GET['id_produk'], $id_user);
     } else {
         $stmt = $conn->prepare("INSERT INTO produk (id_user, id_profil, nama_produk, harga, kategori, deskripsi, whatsapp_link, gambar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("iissssss", $id_user, $id_profil, $nama_produk, $harga, $kategori, $deskripsi, $whatsapp, $gambar);
+        $stmt->bind_param("iissssss", $id_user, $id_profil, $nama_produk, $harga, $id_kategori, $deskripsi, $whatsapp, $gambar);
     }
 
     if ($stmt->execute()) {
@@ -132,15 +132,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="input-group">
-                    <label class="form-label" for="business-category">Kategori Produk </label>
-                    <select class="form-select" id="business-category" name="business-category" required>
+                    <label class="form-label" for="product-category">Kategori Produk </label>
+                    <select class="form-select" id="product-category" name="product-category" required>
                         <option value="Makanan dan Minuman ">Makanan dan Minuman </option>
                         <option value="Fashion">Fashion</option>
                         <option value="Kerajinan">Kerajinan</option>
                         <option value="Produk Kecantikan">Produk Kecantikan</option>
                         <option value="Pertanian dan Perkebunan">Pertanian dan Perkebunan </option>
                     </select>
-                    <div class="validation-message" id="business-category-error">Kategori Produk harus dipilih</div>
+                    <div class="validation-message" id="product-category-error">Kategori Produk harus dipilih</div>
                 </div>
             </div>
 
@@ -217,8 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 validateField('price', val => val.length >= 2, 'Harga(Rp.)');
             });
 
-            $('#business-category').on('change', function() {
-                validateField('business-category', val => val !== '', 'Kategori Produk  harus dipilih');
+            $('#product-category').on('change', function() {
+                validateField('product-category', val => val !== '', 'Kategori Produk  harus dipilih');
             });
 
             $('#business-description').on('blur', function() {
@@ -239,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Validate all fields
                 const isProductNameValid = validateField('product-name', val => val.length >= 2, 'Nama Produk minimal 2 karakter');
                 const isPriceValid = validateField('price', val => val.length >= 2, 'Harga(Rp.)');
-                const isCategoryValid = validateField('business-category', val => val !== '', 'Kategori Produk harus dipilih');
+                const isCategoryValid = validateField('product-category', val => val !== '', 'Kategori Produk harus dipilih');
                 const isDescriptionValid = validateField('business-description', val => val.length >= 10, 'Deskripsi minimal 10 karakter');
                 
                 const whatsappVal = $('#whatsapp-link').val().trim();

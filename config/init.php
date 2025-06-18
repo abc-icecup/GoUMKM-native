@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Sertakan koneksi ke database
-include '../config/koneksi.php'; // pastikan path ini sesuai
+include 'koneksi.php'; // pastikan path ini sesuai
 
 // Fungsi untuk ambil data user dari DB jika session aktif
 function getUserIfExists($conn) {

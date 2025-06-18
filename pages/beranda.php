@@ -1,6 +1,6 @@
 <?php
-require_once '../pages/init.php';
-include '../pages/header.php';
+require_once '../config/init.php';
+include '../includes/header.php';
 ?>
 
 <!DOCTYPE html>
@@ -254,6 +254,6 @@ include '../pages/header.php';
         });
     </script>
 
-    <?php include 'footer.php'; ?>
+    <?php include '../Includes/footer.php'; ?>
 </body>
 </html>

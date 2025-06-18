@@ -2,7 +2,7 @@
 session_start();
 require_once '../config/koneksi.php';
 
-echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
+// echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     unset($_SESSION['form_submitted']);
@@ -61,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Kategori usaha tidak valid.";
     }
 
+    $upload_gambar_baru = isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] !== UPLOAD_ERR_NO_FILE;
+    
     // Validasi gambar
     if (!$upload_gambar_baru) {
         $gambar = $_POST['gambar_lama'] ?? ($data_lama['gambar'] ?? null);
     }
-
-    $upload_gambar_baru = isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] !== UPLOAD_ERR_NO_FILE;
 
     if ($upload_gambar_baru) {
         // $gambar = "$id_user/$file_name";
@@ -469,14 +469,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const isKecamatanValid = validateField('kecamatan', val => val !== '', 'Kecamatan harus dipilih');
                 const isKelurahanValid = validateField('kelurahan', val => val !== '', 'Kelurahan harus dipilih');
                 const isDescriptionValid = validateField('business-description', val => val.length >= 20, 'Deskripsi minimal 20 karakter');
-                
                 const isWhatsappValid = validateField('whatsapp-link', val => /^https:\/\/wa\.me\/\d+$/.test(val), 'Format WA wajib: https://wa.me/628123456789');
 
-                if (!isBusinessNameValid || !isOwnerNameValid || !isCategoryValid || !isAddressValid || 
-                    !isKecamatanValid || !isKelurahanValid || !isDescriptionValid || !isWhatsappValid) {
+                const semuaValid = isBusinessNameValid && isOwnerNameValid && isCategoryValid && isAddressValid &&
+                    isKecamatanValid && isKelurahanValid && isDescriptionValid && isWhatsappValid;
+
+                if (!semuaValid) {
+                    e.preventDefault(); // Jangan submit kalau invalid
                     showError('Silakan perbaiki kesalahan pada form');
                     scrollToFirstError();
-                    return;
                 }
 
                 // DEBUG
