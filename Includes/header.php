@@ -96,7 +96,7 @@ if ($is_logged_in && !$data_profil) {
         }
         .search-container {
             margin: 0;
-            max-width: 100%;
+            max-width: 50%;
         }
     }
 

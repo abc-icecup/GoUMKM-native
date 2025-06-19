@@ -2,7 +2,7 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
+echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     unset($_SESSION['form_submitted']);
@@ -33,8 +33,9 @@ if ($is_edit) {
 
 // Variabel error dan input default
 $error_message = '';
-$gambar_error = '';
+$gambar_usaha_error = '';
 
+$gambar_usaha = $_POST['gambar_usaha'] ?? ($data_lama['gambar_usaha'] ?? '');
 $nama_usaha = $_POST['business-name'] ?? ($data_lama['nama_usaha'] ?? '');
 $nama_pemilik = $_POST['owner-name'] ?? ($data_lama['nama_pemilik'] ?? '');
 $kategori_usaha = $_POST['business-category'] ?? ($data_lama['kategori_usaha'] ?? '');
@@ -43,7 +44,8 @@ $kecamatan = $_POST['kecamatan'] ?? ($data_lama['kecamatan'] ?? '');
 $kelurahan = $_POST['kelurahan'] ?? ($data_lama['kelurahan'] ?? '');
 $deskripsi = $_POST['business-description'] ?? ($data_lama['deskripsi'] ?? '');
 $link_whatsapp = $_POST['whatsapp-link'] ?? ($data_lama['link_whatsapp'] ?? '');
-$gambar = $data_lama['gambar'] ?? '';
+
+// $gambar_usaha = $data_lama['gambar_usaha'] ?? '';
 
 // Jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -61,72 +63,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Kategori usaha tidak valid.";
     }
 
-    $upload_gambar_baru = isset($_FILES['business-photo']) && $_FILES['business-photo']['error'] !== UPLOAD_ERR_NO_FILE;
+    $upload_gambar_baru = isset($_FILES['gambar_usaha']) && $_FILES['gambar_usaha']['error'] !== UPLOAD_ERR_NO_FILE;
     
     // Validasi gambar
     if (!$upload_gambar_baru) {
-        $gambar = $_POST['gambar_lama'] ?? ($data_lama['gambar'] ?? null);
+        $gambar_usaha = $_POST['business-image-old'] ?? ($data_lama['gambar_usaha'] ?? null);
     }
 
     if ($upload_gambar_baru) {
-        // $gambar = "$id_user/$file_name";
-        $ext = pathinfo($_FILES['business-photo']['name'], PATHINFO_EXTENSION);
+        // $gambar_usaha = "$id_user/$file_name";
+        $ext = pathinfo($_FILES['gambar_usaha']['name'], PATHINFO_EXTENSION);
         $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
         
         if (!in_array(strtolower($ext), $allowed_ext)) {
-            $gambar_error = "Format gambar tidak didukung (masukkan jpg, jpeg, png, webp).";
-        } elseif ($_FILES['business-photo']['size'] > 2 * 1024 * 1024) {
-            $gambar_error = "Ukuran gambar maksimal 2MB.";
+            $gambar_usaha_error = "Format gambar tidak didukung (masukkan jpg, jpeg, png, webp).";
+        } elseif ($_FILES['gambar_usaha']['size'] > 2 * 1024 * 1024) {
+            $gambar_usaha_error = "Ukuran gambar maksimal 2MB.";
         } else {
-            $gambar = $_POST['gambar_lama'] ?? null;
+            $gambar_usaha = $_POST['business-image-old'] ?? null;
             $folder = "../user_img/foto_usaha/$id_user/";
             if (!is_dir($folder)) mkdir($folder, 0755, true);
 
-            $file_name = 'usaha_' . time() . '.' . $ext;
+            $file_name = 'usaha_' . $nama_usaha . time() . '.' . $ext;
             $full_path = $folder . $file_name;
 
-            if (move_uploaded_file($_FILES['business-photo']['tmp_name'], $full_path)) {
-                $gambar = "$id_user/$file_name";
-                echo "DEBUG: Gambar baru berhasil diupload => $gambar<br>";
+            if (move_uploaded_file($_FILES['gambar_usaha']['tmp_name'], $full_path)) {
+                $gambar_usaha = "$id_user/$file_name";
+                echo "DEBUG: Gambar baru berhasil diupload => $gambar_usaha<br>";
             } else {
-                $gambar_error = "Gagal mengunggah gambar.";
+                $gambar_usaha_error = "Gagal mengunggah gambar.";
             }
         }
     } else {
         // Jika tidak upload gambar baru, ambil dari hidden input gambar lama
-        $gambar = $_POST['gambar_lama'] ?? null;
+        $gambar_usaha = $_POST['business-image-old'] ?? null;
         
-        echo "DEBUG: gambar lama dari hidden input => " . ($_POST['gambar_lama'] ?? 'NULL') . "<br>";
+        echo "DEBUG: gambar lama dari hidden input => " . ($_POST['business-image-old'] ?? 'NULL') . "<br>";
 
         // Kalau tambah baru tapi tidak upload dan tidak ada gambar lama
-        if (!$is_edit && !$gambar) {
-            $gambar_error = "Foto usaha wajib diunggah.";
+        if (!$is_edit && !$gambar_usaha) {
+            $gambar_usaha_error = "Foto usaha wajib diunggah.";
         }
     }
 
 
-    echo "DEBUG: gambar = $gambar<br>";
-    echo "DEBUG: gambar_error = $gambar_error<br>";
+    echo "DEBUG: gambar = $gambar_usaha<br>";
+    echo "DEBUG: gambar_error = $gambar_usaha_error<br>";
     echo "DEBUG: error_message = $error_message<br>";
 
     // Jika tidak ada error, simpan ke database
-    if (empty($gambar_error) && empty($error_message)) {
+    if (empty($gambar_usaha_error) && empty($error_message)) {
         echo "DEBUG: masuk ke if eksekusi SQL<br>";
         if ($is_edit) {
             echo "DEBUG: mode edit<br>";
             echo "DEBUG: is_edit = " . ($is_edit ? 'true' : 'false') . "<br>";
-            $stmt = $conn->prepare("UPDATE profil_usaha SET gambar=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
-            $stmt->bind_param("sssssssssi", $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
+            $stmt = $conn->prepare("UPDATE profil_usaha SET gambar_usaha=?, nama_usaha=?, nama_pemilik=?, kategori_usaha=?, alamat=?, kecamatan=?, kelurahan=?, deskripsi=?, link_whatsapp=? WHERE id_user=?");
+            $stmt->bind_param("sssssssssi", $gambar_usaha, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp, $id_user);
         } else {
             echo "DEBUG: mode tambah baru<br>";
-            $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("isssssssss", $id_user, $gambar, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
+            $stmt = $conn->prepare("INSERT INTO profil_usaha (id_user, gambar_usaha, nama_usaha, nama_pemilik, kategori_usaha, alamat, kecamatan, kelurahan, deskripsi, link_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("isssssssss", $id_user, $gambar_usaha, $nama_usaha, $nama_pemilik, $kategori_usaha, $alamat, $kecamatan, $kelurahan, $deskripsi, $link_whatsapp);
         }
 
         // HAPUS 2 KODE INI KALAU BERHASIL
-        // var_dump($_POST['gambar_lama']);  // Harus tampil string "nama_file.jpg"
-        // var_dump($gambar);                // Harus sama persis dengan di atas
-        // echo "DEBUG: gambar = " . $gambar; exit;
+        // var_dump($_POST['business-image-old']);  // Harus tampil string "nama_file.jpg"
+        // var_dump($gambar_usaha);                // Harus sama persis dengan di atas
+        // echo "DEBUG: gambar = " . $gambar_usaha; exit;
 
         if ($stmt->execute()) {
             echo "DEBUG: berhasil simpan<br>";
@@ -161,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../css/formulir.css">
 </head>
 <body>
-    <style>
+    <!-- <style>
         .alert-box {
             background-color: #fdecea;
             color: #b71c1c;
@@ -184,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 18px;
             cursor: pointer;
         }
-    </style>
+    </style> -->
     <div class="header">
         <h1 class="brand-title" style="color: #205781;">GoUMKM</h1>
     </div>
@@ -192,28 +194,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="form-container">
         <h2 class="form-title">Formulir Profil Usaha</h2>
         
-        <?php if (!empty($gambar_error)): ?>
+        <?php if (!empty($gambar_usaha_error)): ?>
             <div class="alert-box">
-                <?= htmlspecialchars($gambar_error) ?>
+                <?= htmlspecialchars($gambar_usaha_error) ?>
                 <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
             </div>
         <?php endif; ?>
+         <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_lama['gambar_usaha']) ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old" />
         
         <!-- FORM INPUT PROFIL -->
         <form id="business-profile-form" method="POST" enctype="multipart/form-data">
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
-                    <?php if ($is_edit && isset($data_lama['gambar'])): ?>
-                        <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_lama['gambar']) ?>?v=<?= time() ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old">
-                        <input type="hidden" name="gambar_lama" id="gambar_lama_hidden" value="<?= htmlspecialchars($data_lama['gambar']) ?>">
+                    <?php if ($is_edit && isset($data_lama['gambar_usaha'])): ?>
+
+                        <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_lama['gambar_usaha']) ?>" alt="Foto Usaha Lama" class="photo-preview-old" id="photo-preview-old" />
+                        <input type="hidden" name="business-image-old" id="business-image-old" value="<?= htmlspecialchars($data_lama['gambar_usaha']) ?>">
                     <?php endif; ?>
                     
-                    <input type="file" id="business-photo" name="business-photo" accept="image/*">
+                    <input type="file" id="gambar_usaha" name="gambar_usaha" accept="image/*">
                     <i class="fas fa-camera" id="camera-icon"></i>
-
+ 
                     <!-- Ini untuk JS preview gambar baru -->
                     <img class="photo-preview" id="photo-preview" alt="Preview Gambar Baru">
-                    <div class="tooltip">Upload foto usaha</div>
+                    <div class="tooltip">Upload foto usaha</div> 
                 </div>
             
                 <div class="input-group">
@@ -321,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $(document).ready(function() {
             // Photo upload functionality
-            $('#business-photo').on('change', function(e) {
+            $('#gambar_usaha').on('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
                     if (file.size > 2 * 1024 * 1024) { // 5MB limit
@@ -343,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Click on photo upload area
             $('#photo-upload').on('click', function(e) {
                 if (e.target.type !== 'file') {
-                    $('#business-photo').click();
+                    $('#gambar_usaha').click();
                 }
             });
 
@@ -481,8 +485,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 // DEBUG
-                const gambarLama = document.getElementById('gambar_lama_hidden');
-                console.log("DEBUG: gambar_lama yang terkirim =", gambarLama ? gambarLama.value : 'TIDAK ADA');
+                const gambarLama = document.getElementById('business-image-old');
+                console.log("DEBUG: business-image-old yang terkirim =", gambarLama ? gambarLama.value : 'TIDAK ADA');
             });
 
             // Utility functions

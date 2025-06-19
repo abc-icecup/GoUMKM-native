@@ -31,7 +31,7 @@ if (!$data_profil) {
 $id_profil = $data_profil['id_profil'];
 
 // Saat menyimpan produk
-$stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar) VALUES (?, ?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO produk (id_profil, nama_produk, deskripsi, harga, gambar_produk) VALUES (?, ?, ?, ?, ?)");
 $stmt->bind_param("issds", $id_profil, $nama, $deskripsi, $harga, $gambar);
 ?>
 
