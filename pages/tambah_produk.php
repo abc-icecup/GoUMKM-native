@@ -113,15 +113,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form id="business-profile-form" enctype="multipart/form-data" method="POST" action="">
             <div class="photo-upload-section">
                 <div class="photo-upload" id="photo-upload">
-                    <input type="file" id="gambar_produk" name="gambar_produk" accept="image/*" required>
+                    <input type="file" id="gambar_produk" name="gambar_produk" accept="image/*" <?= $is_edit ? '' : 'required' ?>>
                     <i class="fas fa-camera" id="camera-icon"></i>
-                    <img class="photo-preview" id="photo-preview" alt="Preview">
-                    <div class="tooltip">Upload foto produk </div>
+                    <?php if (!empty($data_produk['gambar_produk'])): ?>
+                        <img class="photo-preview" id="photo-preview" src="../user_img/foto_produk/<?= htmlspecialchars($data_produk['gambar_produk']) ?>" alt="Preview">
+                    <?php else: ?>
+                        <img class="photo-preview" id="photo-preview" alt="Preview">
+                    <?php endif; ?>
+
+                    <div class="tooltip">Upload foto produk</div>
                 </div>
                 
                 <div class="input-group">
                     <label class="form-label" for="nama_produk">Nama Produk </label>
-                    <input type="text" class="form-input" id="nama_produk" name="nama_produk" placeholder="Masukkan nama Produk" required>
+                    <input type="text" class="form-input" id="nama_produk" name="nama_produk" placeholder="Masukkan nama Produk" value="<?= htmlspecialchars($data_produk['nama_produk'] ?? '') ?>" required>
                     <div class="validation-message" id="nama_produk-error">Nama Produk harus diisi</div>
                 </div>
             </div>
@@ -129,18 +134,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="input-row">
                 <div class="input-group">
                     <label class="form-label" for="harga">Harga(Rp.)</label>
-                    <input type="text" class="form-input" id="harga" name="harga" placeholder="Masukkan Harga " required>
+                    <input type="text" class="form-input" id="harga" name="harga" placeholder="Masukkan Harga " value="<?= htmlspecialchars($data_produk['harga'] ?? '') ?>" required>
                     <div class="validation-message" id="harga-error">Harga harus diisi</div>
                 </div>
 
                 <div class="input-group">
-                    <label class="form-label" for="id_kategori">Kategori Produk </label>
+                    <label class="form-label" for="id_kategori">Kategori Produk</label>
                     <select class="form-select" id="id_kategori" name="id_kategori" required>
-                        <option value="1">Makanan dan Minuman </option>
-                        <option value="2">Fashion</option>
-                        <option value="3">Kerajinan</option>
-                        <option value="4">Produk Kecantikan</option>
-                        <option value="6">Pertanian dan Perkebunan</option>
+                        <option value="1" <?= (isset($data_produk['id_kategori']) && $data_produk['id_kategori'] == 1) ? 'selected' : '' ?>>Makanan dan Minuman</option>
+                        <option value="2" <?= (isset($data_produk['id_kategori']) && $data_produk['id_kategori'] == 2) ? 'selected' : '' ?>>Fashion</option>
+                        <option value="3" <?= (isset($data_produk['id_kategori']) && $data_produk['id_kategori'] == 3) ? 'selected' : '' ?>>Kerajinan</option>
+                        <option value="4" <?= (isset($data_produk['id_kategori']) && $data_produk['id_kategori'] == 4) ? 'selected' : '' ?>>Produk Kecantikan</option>
+                        <option value="6" <?= (isset($data_produk['id_kategori']) && $data_produk['id_kategori'] == 6) ? 'selected' : '' ?>>Pertanian dan Perkebunan</option>
                     </select>
                     <div class="validation-message" id="id_kategori-error">Kategori Produk harus dipilih</div>
                 </div>
@@ -148,13 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="input-group full-width">
                 <label class="form-label" for="deskripsi">Deskripsi Produk </label>
-                <textarea class="form-textarea" id="deskripsi" name="deskripsi" placeholder="Ceritakan tentang Produk  Anda..." required></textarea>
+                <textarea class="form-textarea" id="deskripsi" name="deskripsi" placeholder="Ceritakan tentang Produk  Anda..." required><?= htmlspecialchars($data_produk['deskripsi'] ?? '') ?></textarea>
                 <div class="validation-message" id="deskripsi-error">Deskripsi Produk  harus diisi</div>
             </div>
 
             <div class="input-group full-width">
                 <label class="form-label" for="link_whatsapp">Link WhatsApp</label>
-                <input type="url" class="form-input" id="link_whatsapp" name="link_whatsapp" placeholder="https://wa.me/628123456789">
+                <input type="url" class="form-input" id="link_whatsapp" name="link_whatsapp" placeholder="https://wa.me/62xxxxxxxxxxx" value="<?= htmlspecialchars($data_produk['link_whatsapp'] ?? '') ?>">
                 <div class="validation-message" id="link_whatsapp-error">Format link WhatsApp tidak valid</div>
             </div>
 

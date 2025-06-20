@@ -1,6 +1,20 @@
 <?php
 require_once '../config/init.php';
 include '../includes/header.php';
+
+// Ambil semua produk yang punya profil usaha
+$query = "
+    SELECT 
+        produk.id_produk,
+        produk.nama_produk,
+        produk.harga,
+        produk.gambar_produk,
+        profil_usaha.nama_usaha
+    FROM produk
+    INNER JOIN profil_usaha ON produk.id_profil = profil_usaha.id_profil
+    ORDER BY produk.id_produk DESC
+";
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -59,51 +73,30 @@ include '../includes/header.php';
     </section>
 
     <!-- Products Grid -->
-    <section class="products">
+    <div class="products-section">
         <div class="products-grid">
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image"></div>
-                <div class="product-title">Nama Produk</div>
-                <div class="product-subtitle">Nama Toko</div>
-                <div class="product-price">Rp -</div>
-            </div>
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <a href="katalog_produk.php?id_produk=<?= $row['id_produk'] ?>" class="product-card">
+                        <div class="product-image">
+                            <?php if (!empty($row['gambar_produk'])): ?>
+                                <img src="../user_img/foto_produk/<?= htmlspecialchars($row['gambar_produk']) ?>" alt="Gambar Produk">
+                            <?php else: ?>
+                                <img src="icon/no-image.png" alt="Belum ada gambar" />
+                            <?php endif; ?>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name"><?= htmlspecialchars($row['nama_produk']) ?></div>
+                            <div class="price">Rp<?= number_format($row['harga'], 0, ',', '.') ?></div>
+                            <div class="toko-link"><?= htmlspecialchars($row['nama_usaha']) ?></div>
+                        </div>
+                    </a>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>Tidak ada produk ditemukan.</p>
+            <?php endif; ?>
         </div>
-    </section>
+    </div>
 
     <!-- jQuery Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

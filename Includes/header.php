@@ -123,7 +123,7 @@ if ($is_logged_in && !$data_profil) {
     </a>
     
     <?php if ($is_logged_in): ?>
-        <a href="profil_usaha.php" class="profile-icon" id="profileToggle">
+        <a href="../pages/profil_usaha.php" class="profile-icon" id="profileToggle">
             <?php if (!empty($data_profil['gambar'])): ?>
                 <img src="../user_img/foto_usaha/<?= htmlspecialchars($data_profil['gambar']) ?>" alt="Akun" class="user-avatar">
             <?php else: ?>

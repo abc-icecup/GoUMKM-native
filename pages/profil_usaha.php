@@ -233,12 +233,12 @@ $result_produk = $query_produk->get_result();
             });
 
             // // Klik ikon profil → toggle dropdown
-            // $('.profile-icon').on('click', function (e) {
-            //     e.preventDefault(); // Hindari redirect ke profil_usaha.php
-            //     e.stopPropagation(); // Mencegah klik ke dokumen
+            $('.profile-icon').on('click', function (e) {
+                e.preventDefault(); // Hindari redirect ke profil_usaha.php
+                e.stopPropagation(); // Mencegah klik ke dokumen
 
-            //     $('.profile-dropdown').fadeToggle(200);
-            // });
+                $('.profile-dropdown').fadeToggle(200);
+            });
 
             // Klik di luar dropdown → tutup
             $(document).on('click', function (e) {
