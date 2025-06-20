@@ -14,7 +14,7 @@ include '../includes/header.php';
 </head>
 
 <body>
-    <div class="header">
+    <!-- <div class="header">
         <div class="logo">
             <div class="logo-icon">Go</div>
             UMKM
@@ -27,7 +27,7 @@ include '../includes/header.php';
             <button class="nav-btn">Masuk</button>
             <button class="nav-btn primary">Daftar</button>
         </div>
-    </div>
+    </div> -->
 
     <div class="container">
         <div class="image-section">

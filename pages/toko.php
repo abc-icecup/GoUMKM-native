@@ -46,7 +46,7 @@ if (!$data_usaha) {
 </head>
 <body>
     <!-- HEADER -->
-    <header class="header">
+    <!-- <header class="header">
         <div class="nav-left" >
             <a href="#">
                 <img src="../assets/img/image (2).png" alt="logo umkm" class="logo-umkm" height="30px">
@@ -61,10 +61,10 @@ if (!$data_usaha) {
         <div class="nav-buttons">
             <a href="masuk.php" class="nav-btn">Masuk</a>
             <a href="daftar.php" class="nav-btn">Daftar</a>
-            <!-- <button class="nav-btn">Masuk</button>
-            <button class="nav-btn">Daftar</button> -->
+            <button class="nav-btn">Masuk</button>
+            <button class="nav-btn">Daftar</button>
         </div>
-    </header>
+    </header> -->
 
     <!-- <div class="container">
         Header
@@ -95,7 +95,7 @@ if (!$data_usaha) {
             </div>
             
             <div class="categories">
-                <a href="kategori.php" class="category-btn">Kategori</a>
+                <a href="kategori.php" class="category-btn" style="text-decoration: none;">Kategori</a>
             </div>
 
 

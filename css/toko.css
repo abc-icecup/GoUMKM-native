@@ -31,18 +31,18 @@ body {
     font-size: 16px;
 }
 
-.search-container {
+/* .search-container {
     display: flex;
     align-items: center;
     gap: 10px;
-}
+} */
 
-.search-box {
+/* .search-box {
     padding: 8px 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
     width: 300px;
-}
+} */
 
 .search-btn {
     background-color: #2c5aa0;
@@ -207,13 +207,13 @@ body {
         gap: 15px;
     }
 
-    .search-container {
+    /* .search-container {
         width: 100%;
-    }
+    } */
 
-    .search-box {
+    /* .search-box {
         flex: 1;
-    }
+    } */
 
     .store-header {
         flex-direction: column;
