@@ -87,8 +87,8 @@ $result = $conn->query($query);
                         </div>
                         <div class="product-info">
                             <div class="product-name"><?= htmlspecialchars($row['nama_produk']) ?></div>
-                            <div class="price">Rp<?= number_format($row['harga'], 0, ',', '.') ?></div>
                             <div class="toko-link"><?= htmlspecialchars($row['nama_usaha']) ?></div>
+                            <div class="price">Rp<?= number_format($row['harga'], 0, ',', '.') ?></div>
                         </div>
                     </a>
                 <?php endwhile; ?>
