@@ -1,3 +1,25 @@
+<?php
+require_once '../config/init.php';
+
+$kategori = isset($_GET['kategori']) ? $_GET['kategori'] : '';
+
+$query = "SELECT produk.*, profil_usaha.nama_usaha 
+          FROM produk 
+          JOIN profil_usaha ON produk.id_profil = profil_usaha.id_profil";
+
+if (!empty($kategori)) {
+    $query .= " WHERE produk.id_kategori = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $kategori);
+} else {
+    $stmt = $conn->prepare($query);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -22,12 +44,12 @@
                     <span id="categoryText">Kategori</span>
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" data-value="">Semua Kategori</div>
-                    <div class="dropdown-item" data-value="makanan-minuman">Makanan dan Minuman</div>
-                    <div class="dropdown-item" data-value="fashion">Fashion</div>
-                    <div class="dropdown-item" data-value="kerajinan">Kerajinan</div>
-                    <div class="dropdown-item" data-value="kecantikan">Produk Kecantikan</div>
-                    <div class="dropdown-item" data-value="pertanian">Pertanian dan Perkebunan</div>
+                    <div class="dropdown-item <?= $kategori == '' ? 'active' : '' ?>" data-value="">Semua Kategori</div>
+                    <div class="dropdown-item <?= $kategori == 'makanan-minuman' ? 'active' : '' ?>" data-value="makanan-minuman">Makanan dan Minuman</div>
+                    <div class="dropdown-item <?= $kategori == 'fashion' ? 'active' : '' ?>" data-value="fashion">Fashion</div>
+                    <div class="dropdown-item <?= $kategori == 'kerajinan' ? 'active' : '' ?>" data-value="kerajinan">Kerajinan</div>
+                    <div class="dropdown-item <?= $kategori == 'kecantikan' ? 'active' : '' ?>" data-value="kecantikan">Produk Kecantikan</div>
+                    <div class="dropdown-item <?= $kategori == 'pertanian' ? 'active' : '' ?>" data-value="pertanian">Pertanian dan Perkebunan</div>
                 </div>
             </div>
             <input type="text" class="search-input" placeholder="nama produk" id="searchInput">

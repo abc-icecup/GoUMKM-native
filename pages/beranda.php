@@ -64,13 +64,14 @@ $result = $conn->query($query);
     </section>
 
     <!-- Categories -->
-    <section class="categories">
-        <button class="product-category">Makanan dan Minuman</button>
-        <button class="product-category">Fashion</button>
-        <button class="product-category">Kerajinan</button>
-        <button class="product-category">Produk Kecantikan</button>
-        <button class="product-category">Pertanian dan Perkebunan</button>
+    <section class="categories" >
+        <a class="product-category" href="kategori.php?kategori=makanan-minuman">Makanan dan Minuman</a>
+        <a class="product-category" href="kategori.php?kategori=fashion">Fashion</a>
+        <a class="product-category" href="kategori.php?kategori=kerajinan">Kerajinan</a>
+        <a class="product-category" href="kategori.php?kategori=kecantikan">Produk Kecantikan</a>
+        <a class="product-category" href="kategori.php?kategori=pertanian">Pertanian dan Perkebunan</a>
     </section>
+
 
     <!-- Products Grid -->
     <div class="products-section">
@@ -141,11 +142,11 @@ $result = $conn->query($query);
             });
 
             // Product card interactions
-            $('.product-card').click(function() {
-                const productName = $(this).find('.product-title').text();
-                const storeName = $(this).find('.product-subtitle').text();
-                alert(`Produk: ${productName}\nToko: ${storeName}`);
-            });
+            // $('.product-card').click(function() {
+            //     const productName = $(this).find('.product-title').text();
+            //     const storeName = $(this).find('.product-subtitle').text();
+            //     alert(`Produk: ${productName}\nToko: ${storeName}`);
+            // });
 
             // Product card hover effects
             $('.product-card').hover(

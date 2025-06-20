@@ -2,7 +2,7 @@
 session_start();
 require_once '../config/koneksi.php';
 
-echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
+// echo "SESSION: " . ($_SESSION['form_submitted'] ?? 'not set') . "<br>"; // <-- DEBUG: tampilkan status session
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     unset($_SESSION['form_submitted']);
